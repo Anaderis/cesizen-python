@@ -1,5 +1,7 @@
+from sys import prefix
+
 from fastapi import FastAPI
-from app.routes import route
+from app.controllers.user_route import route
 
 app = FastAPI()
-app.include_router(route)
+app.include_router(route, prefix="/api")
