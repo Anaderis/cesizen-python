@@ -56,7 +56,7 @@ class User(Base):
     phone = Column(String(20))
     photo = Column(String(255))
     description = Column(Text)
-    role_id = Column(Integer, ForeignKey("role.id"), nullable=False)
+    role_id = Column(Integer, ForeignKey("role.id"), nullable=False, default=1)
 
     created_at = Column(TIMESTAMP, default=datetime.utcnow)
     updated_at = Column(TIMESTAMP)
