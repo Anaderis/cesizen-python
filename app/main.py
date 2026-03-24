@@ -1,5 +1,3 @@
-from sys import prefix
-
 from fastapi import FastAPI
 from app.controllers.user_route import route
 

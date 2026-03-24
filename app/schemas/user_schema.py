@@ -1,10 +1,8 @@
 from pydantic import BaseModel
 
-# Schema du JSON qu'on renvoie
-# Le schéma permet de filtrer ce que le JSON renvoie, par exemple, il ne renverra pas le MDP
-# Il gère aussi tout ce qui est champ VIDE dans un post par exemple
 
-class UserSchema(BaseModel):
+# Schema pour la création d'un utilisateur (POST) - inclut le mot de passe
+class UserCreate(BaseModel):
     name: str
     surname: str
     email: str
@@ -14,7 +12,29 @@ class UserSchema(BaseModel):
     description: str | None = None
     role_id: int = 1
 
-    # il faut lui dire de lire tous les attributs de l'objet user, autrement il attend un dictionnaire
-    # mais le db.queryAll() renvoie un objet donc pas facile
+
+# Schema pour la modification d'un utilisateur (PUT) - tous les champs optionnels
+class UserUpdate(BaseModel):
+    name: str | None = None
+    surname: str | None = None
+    email: str | None = None
+    password: str | None = None
+    phone: str | None = None
+    photo: str | None = None
+    description: str | None = None
+    role_id: int | None = None
+
+
+# Schema pour les réponses (GET) - exclut le mot de passe
+class UserOut(BaseModel):
+    id: int
+    name: str
+    surname: str
+    email: str
+    phone: str | None = None
+    photo: str | None = None
+    description: str | None = None
+    role_id: int
+
     class Config:
         from_attributes = True
