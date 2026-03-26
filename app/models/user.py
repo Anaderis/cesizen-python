@@ -1,8 +1,7 @@
 from sqlalchemy import Column, Integer, String, Text, Boolean, Date, TIMESTAMP, ForeignKey
-from sqlalchemy.orm import relationship, declarative_base
+from sqlalchemy.orm import relationship
 from datetime import datetime
-
-Base = declarative_base()
+from app.database import Base
 
 
 # ========================
@@ -15,32 +14,6 @@ class Role(Base):
     type = Column(String(100), unique=True, nullable=False)
 
     user = relationship("User", back_populates="role")
-
-
-# ========================
-# CATEGORY
-# ========================
-class Category(Base):
-    __tablename__ = "category"
-
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(100), unique=True, nullable=False)
-
-    articles = relationship("ArticleSante", back_populates="category")
-    activity = relationship("Activity", back_populates="category")
-
-
-# ========================
-# FORMAT
-# ========================
-class Format(Base):
-    __tablename__ = "format"
-
-    id = Column(Integer, primary_key=True, index=True)
-    type = Column(String(50), unique=True, nullable=False)
-
-    activity = relationship("Activity", back_populates="format")
-
 
 # ========================
 # USER
@@ -56,7 +29,8 @@ class User(Base):
     phone = Column(String(20))
     photo = Column(String(255))
     description = Column(Text)
-    role_id = Column(Integer, ForeignKey("role.id"), nullable=False, default=1)
+    role_id = Column(Integer, ForeignKey("role.id"), nullable=False)
+    is_active = Column(Boolean, default=True)
 
     created_at = Column(TIMESTAMP, default=datetime.utcnow)
     updated_at = Column(TIMESTAMP)
@@ -64,63 +38,6 @@ class User(Base):
     role = relationship("Role", back_populates="user")
     favorites = relationship("Favorites", back_populates="user")
     logs = relationship("Log", back_populates="user")
-
-
-# ========================
-# ARTICLE SANTE
-# ========================
-class ArticleSante(Base):
-    __tablename__ = "article_sante"
-
-    id = Column(Integer, primary_key=True, index=True)
-    title = Column(String(255), nullable=False)
-    description = Column(Text)
-    publish_date = Column(Date)
-    active = Column(Boolean, default=True)
-    category_id = Column(Integer, ForeignKey("category.id"), nullable=False)
-
-    created_at = Column(TIMESTAMP, default=datetime.utcnow)
-
-    #back populate fait le lien avec la "variable" articles de la classe Category 
-    # donc il faut que ce soit le même nom de variable, ici category
-    category = relationship("Category", back_populates="articles")
-
-
-# ========================
-# ACTIVITIES
-# ========================
-class Activity(Base):
-    __tablename__ = "activity"
-
-    id = Column(Integer, primary_key=True, index=True)
-    title = Column(String(255), nullable=False)
-    description = Column(Text)
-    url = Column(String(500))
-    active = Column(Boolean, default=True)
-
-    category_id = Column(Integer, ForeignKey("category.id"), nullable=False)
-    format_id = Column(Integer, ForeignKey("format.id"), nullable=False)
-
-    created_at = Column(TIMESTAMP, default=datetime.utcnow)
-
-    category = relationship("Category", back_populates="activity")
-    format = relationship("Format", back_populates="activity")
-    favorites = relationship("Favorites", back_populates="activity")
-
-
-# ========================
-# FAVORITES (Table jointeure entre User et Activity)
-# ========================
-class Favorites(Base):
-    __tablename__ = "favorites"
-
-    user_id = Column(Integer, ForeignKey("user.id"), primary_key=True)
-    activity_id = Column(Integer, ForeignKey("activity.id"), primary_key=True)
-
-    created_at = Column(TIMESTAMP, default=datetime.utcnow)
-
-    user = relationship("User", back_populates="favorites")
-    activity = relationship("Activity", back_populates="favorites")
 
 
 # ========================
