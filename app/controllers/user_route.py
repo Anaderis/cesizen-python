@@ -1,47 +1,53 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from app.schemas.user_schema import UserCreate, UserOut, UserUpdate
-from app.services.user_service import get_all_users, create_user, update_user
-
+from app.services.user_service import get_all_users, get_user_by_id, create_user, update_user, delete_user
+from app.dependencies import require_admin, require_user
 
 route = APIRouter(prefix="/users", tags=["Users"])
 
-# GET : Tous les utilisateurs
+# GET : Tous les utilisateurs → admin uniquement
 @route.get("/", response_model=list[UserOut])
-def get_users_endpoint():
+def get_users_endpoint(_: dict = Depends(require_admin)):
     return get_all_users()
 
-# GET : Utilisateur par ID
-@route.get("/{id}")
-def get_user_id_endpoint(id: int):
-    return {"user_id": id}
+# GET : Utilisateur par ID → utilisateur connecté (son propre compte) ou admin
+@route.get("/{id}", response_model=UserOut)
+def get_user_id_endpoint(id: int, current_user: dict = Depends(require_user)):
+    if current_user["role_id"] != 2 and current_user["id"] != id:
+        raise HTTPException(status_code=403, detail="Accès non autorisé")
+    user = get_user_by_id(id)
+    if not user:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+    return user
 
-# POST : Créer un utilisateur
-@route.post("/create", response_model=UserOut)
+# POST : Créer un utilisateur → public (pas de Depends)
+@route.post("/create")
 def create_user_endpoint(user: UserCreate):
-    return create_user(user)
+    created = create_user(user)
+    return {"message": "Utilisateur créé", "user": UserOut.model_validate(created)}
 
-# PUT : Modifier un utilisateur
-# User out est un modèle qui exclut le mot de passe, on ne veut pas le renvoyer dans la réponse
-@route.put("/{id}", response_model=UserOut)
-def update_user_endpoint(id: int, user: UserUpdate):
+# PUT : Modifier un utilisateur → utilisateur connecté (son propre compte) ou admin
+@route.put("/{id}")
+def update_user_endpoint(id: int, user: UserUpdate, current_user: dict = Depends(require_user)):
+    if current_user["role_id"] != 2 and current_user["id"] != id:
+        raise HTTPException(status_code=403, detail="Accès non autorisé")
     updated = update_user(id, user)
     if not updated:
         raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
-    return updated
+    return {"message": "Utilisateur modifié", "user": UserOut.model_validate(updated)}
 
-# TO DO : PUT : Désactiver un utilisateur (is_active = False)
-# pour désactiver le compte utilisateur, on peut faire une route PUT qui met à jour 
-# un champ "is_active" à False
-@route.put("{id}/deactivate", response_model=UserOut)
-def deactivate_user_endpoint(id: int):
+# PUT : Désactiver un utilisateur → admin uniquement
+@route.put("/deactivate/{id}")
+def deactivate_user_endpoint(id: int, _: dict = Depends(require_admin)):
     deactivate = update_user(id, UserUpdate(is_active=False))
     if not deactivate:
         raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
-    return deactivate
+    return {"message": "Utilisateur désactivé", "user": UserOut.model_validate(deactivate)}
 
-# TO DO : DELETE : Supprimer un utilisateur
-
-
-
-
-
+# DELETE : Supprimer un utilisateur → admin uniquement
+@route.delete("/{id}")
+def delete_user_endpoint(id: int, _: dict = Depends(require_admin)):
+    deleted = delete_user(id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+    return {"message": "Utilisateur supprimé"}
