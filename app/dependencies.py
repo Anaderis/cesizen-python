@@ -1,18 +1,19 @@
 from fastapi import Depends, HTTPException
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import jwt, JWTError
 
 SECRET_KEY = "cesizen_secret_key"
 ALGORITHM = "HS256"
 
-# Indique à FastAPI où trouver le token (dans le header Authorization: Bearer <token>)
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
+# HTTPBearer permet de coller directement le token dans Swagger (champ "Value")
+bearer_scheme = HTTPBearer()
 
 
-def get_current_user(token: str = Depends(oauth2_scheme)):
+def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)):
+    token = credentials.credentials
     """Vérifie que le token est valide et retourne les données de l'utilisateur connecté."""
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])  # type: ignore[arg-type]
         user_id = payload.get("sub")
         role_id = payload.get("role_id")
         if user_id is None:
