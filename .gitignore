@@ -12,4 +12,5 @@ __pycache__/
 # fichiers système
 .DS_Store
 
-# Anais123!
+# Variables d'environnement (contient les clés secrètes)
+.env
