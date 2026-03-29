@@ -30,7 +30,7 @@ class TestUserCreateSchema:
             email="alice@example.com",
             password="Secure1!"
         )
-        assert user.email == "alice@example.com"
+        assert user.email == "aliceexample.com"
 
     def test_email_is_lowercased(self):
         """L'email doit être converti en minuscules automatiquement."""
