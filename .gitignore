@@ -11,3 +11,6 @@ __pycache__/
 
 # fichiers système
 .DS_Store
+
+# Variables d'environnement (contient les clés secrètes)
+.env

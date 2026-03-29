@@ -1,0 +1,35 @@
+name: Tests
+
+# Se déclenche uniquement sur les Pull Requests vers main
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Récupère le code de la branche
+      - name: Récupérer le code
+        uses: actions/checkout@v3
+
+      # 2. Installe Python
+      - name: Installer Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      # 3. Installe les dépendances
+      - name: Installer les dépendances
+        run: pip install -r requirements.txt
+
+      # 4. Crée le fichier .env avec la clé secrète
+      #    (stockée dans les secrets GitHub, jamais visible dans le code)
+      - name: Créer le fichier .env
+        run: echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" > .env
+
+      # 5. Lance les tests
+      - name: Lancer les tests
+        run: python -m pytest tests/ -v
