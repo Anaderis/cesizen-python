@@ -13,11 +13,11 @@ jobs:
     steps:
       # 1. Récupère le code de la branche
       - name: Récupérer le code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # 2. Installe Python
       - name: Installer Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
