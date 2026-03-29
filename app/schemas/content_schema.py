@@ -1,4 +1,4 @@
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, ConfigDict, field_validator
 from datetime import date
 
 #from_attributes est utilisé pour permettre la conversion d'instances de classes ORM 
@@ -13,8 +13,7 @@ class CategoryOut(BaseModel):
     id: int
     name: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # ========================
@@ -24,8 +23,7 @@ class FormatOut(BaseModel):
     id: int
     type: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # ========================
@@ -73,8 +71,7 @@ class ArticleOut(BaseModel):
     category_id: int
     category: CategoryOut | None = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # ========================
@@ -126,5 +123,4 @@ class ActivityOut(BaseModel):
     category: CategoryOut | None = None
     format: FormatOut | None = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

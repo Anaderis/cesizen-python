@@ -1,8 +1,12 @@
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import jwt, JWTError
+import os
+from dotenv import load_dotenv
 
-SECRET_KEY = "cesizen_secret_key"
+load_dotenv()
+
+SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 
 # HTTPBearer permet de coller directement le token dans Swagger (champ "Value")

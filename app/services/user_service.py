@@ -5,9 +5,13 @@ from app.database import SessionLocal
 import bcrypt
 from jose import jwt
 from datetime import datetime, timedelta, timezone
+import os
+from dotenv import load_dotenv
 
-# Clé secrète utilisée pour signer les tokens JWT (à garder confidentielle)
-SECRET_KEY = "cesizen_secret_key"
+load_dotenv()
+
+# Clé secrète chargée depuis le fichier .env (jamais en dur dans le code)
+SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 # Durée de validité du token : 60 minutes
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
