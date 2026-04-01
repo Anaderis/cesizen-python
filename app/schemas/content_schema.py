@@ -66,6 +66,7 @@ class ArticleOut(BaseModel):
     title: str
     description: str | None = None
     content: str | None = None
+    photo: str | None = None
     publish_date: date | None = None
     active: bool
     category_id: int

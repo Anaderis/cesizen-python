@@ -8,6 +8,10 @@ import bcrypt
 from unittest.mock import MagicMock, patch
 from app.services.user_service import login_user
 
+# "Patch" permet de créer de faux objets et de simuler le comportement de la base de données 
+# sans toucher à la vraie BDD.
+# Il retourne un objet fictif (MagicMock) qui peut être configuré 
+# pour simuler les réponses de la base de données.
 
 class TestLoginUser:
 
