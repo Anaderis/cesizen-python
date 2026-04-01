@@ -39,6 +39,7 @@ class ArticleSante(Base):
     title = Column(String(255), nullable=False)
     description = Column(Text)        # courte accroche pour la liste d'articles
     content = Column(Text)            # contenu HTML complet affiché sur la page
+    photo = Column(String(255))       # nom du fichier image (ex: depression.jpg)
     publish_date = Column(Date)
     active = Column(Boolean, default=True)
     category_id = Column(Integer, ForeignKey("category.id"), nullable=False)
