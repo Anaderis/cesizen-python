@@ -6,7 +6,11 @@
       "Bash(python -c \"import secrets; print\\(secrets.token_hex\\(32\\)\\)\")",
       "Bash(python -m pip install python-dotenv)",
       "Bash(python -m pytest tests/ -q)",
-      "Bash(python -m pip freeze)"
+      "Bash(python -m pip freeze)",
+      "WebSearch",
+      "WebFetch(domain:aaru5h.github.io)",
+      "WebFetch(domain:sanchariiii.github.io)",
+      "WebFetch(domain:amalkrishnanvp.github.io)"
     ]
   }
 }

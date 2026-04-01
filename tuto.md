@@ -3,9 +3,6 @@
 # Création de l'envionnement virtuel
 python -m venv pythonCesizen
 
-# Activer l'environnement avec cmd
-env\Scripts\activate
-
 # Activer l'environnement avec Powershell
 .\pythonCesizen\Scripts\Activate.ps1
 

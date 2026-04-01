@@ -1,17 +1,60 @@
 <template>
-  <!-- HERO -->
-  <section class="hero">
-    <div class="container hero__content">
-      <h1 class="hero__title">Prenez soin de votre<br>santé mentale</h1>
-      <p class="hero__subtitle">
-        CESIZen vous accompagne avec des ressources adaptées, des activités de détente
-        et un espace personnalisé pour votre bien-être au quotidien.
-      </p>
-      <div class="hero__actions">
-        <router-link to="/login" class="btn btn-primary">Créer un compte</router-link>
-        <router-link to="/login" class="btn btn-outline">Se connecter</router-link>
-      </div>
+  <!-- CAROUSEL HERO -->
+  <section class="carousel" aria-label="Articles à la une">
+
+    <!-- Slides -->
+    <div class="carousel__track">
+      <transition name="slide" mode="out-in">
+        <div
+          v-if="carouselArticles.length"
+          :key="currentIndex"
+          class="carousel__slide"
+          :style="slideStyle"
+        >
+          <div class="carousel__overlay"></div>
+          <div class="container carousel__content">
+            <span class="carousel__tag">{{ carouselArticles[currentIndex].category?.name }}</span>
+            <h1 class="carousel__title">{{ carouselArticles[currentIndex].title }}</h1>
+            <p class="carousel__excerpt">{{ carouselArticles[currentIndex].description }}</p>
+            <router-link
+              :to="`/prevention/${carouselArticles[currentIndex].id}`"
+              class="btn carousel__btn"
+            >
+              Lire l'article →
+            </router-link>
+          </div>
+        </div>
+
+        <!-- Fallback si pas d'articles -->
+        <div v-else key="fallback" class="carousel__slide carousel__slide--fallback">
+          <div class="container carousel__content">
+            <h1 class="carousel__title">Prenez soin de votre<br>santé mentale</h1>
+            <p class="carousel__excerpt">
+              CESIZen vous accompagne avec des ressources adaptées et des activités de détente.
+            </p>
+            <router-link to="/prevention" class="btn carousel__btn">Découvrir les articles →</router-link>
+          </div>
+        </div>
+      </transition>
     </div>
+
+    <!-- Contrôles -->
+    <div v-if="carouselArticles.length > 1" class="carousel__controls">
+      <button class="carousel__arrow" @click="prev" aria-label="Article précédent">‹</button>
+
+      <div class="carousel__dots">
+        <button
+          v-for="(_, i) in carouselArticles"
+          :key="i"
+          :class="['carousel__dot', { active: i === currentIndex }]"
+          @click="currentIndex = i"
+          :aria-label="`Article ${i + 1}`"
+        ></button>
+      </div>
+
+      <button class="carousel__arrow" @click="next" aria-label="Article suivant">›</button>
+    </div>
+
   </section>
 
   <!-- FONCTIONNALITÉS -->
@@ -52,48 +95,220 @@
   </section>
 </template>
 
+<script setup>
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+
+const articles     = ref([])
+const currentIndex = ref(0)
+let   autoplayTimer = null
+
+onMounted(async () => {
+  try {
+    const res = await fetch('/api/articles/')
+    if (res.ok) {
+      const data = await res.json()
+      // On prend les 3 premiers articles actifs
+      articles.value = data.filter(a => a.active).slice(0, 3)
+    }
+  } catch (_) { /* silencieux — fallback affiché */ }
+
+  startAutoplay()
+})
+
+onUnmounted(() => clearInterval(autoplayTimer))
+
+const carouselArticles = computed(() => articles.value)
+
+const slideStyle = computed(() => {
+  const article = carouselArticles.value[currentIndex.value]
+  if (article?.photo) {
+    return { backgroundImage: `url(/src/assets/img/${article.photo})` }
+  }
+  return {}
+})
+
+function next() {
+  currentIndex.value = (currentIndex.value + 1) % carouselArticles.value.length
+  restartAutoplay()
+}
+
+function prev() {
+  currentIndex.value = (currentIndex.value - 1 + carouselArticles.value.length) % carouselArticles.value.length
+  restartAutoplay()
+}
+
+function startAutoplay() {
+  autoplayTimer = setInterval(next, 5000)
+}
+
+function restartAutoplay() {
+  clearInterval(autoplayTimer)
+  startAutoplay()
+}
+</script>
+
 <style scoped>
-/* Hero */
-.hero {
-  background: linear-gradient(135deg, #0d9488 0%, #14b8a6 60%, #5c724e 100%);
-  color: #ffffff;
-  padding: 5rem 0;
-  text-align: center;
+/* ========================
+   CAROUSEL
+   ======================== */
+.carousel {
+  position: relative;
+  overflow: hidden;
 }
 
-.hero__title {
-  font-size: var(--font-size-2xl);
-  font-weight: 700;
-  margin-bottom: 1rem;
-  line-height: 1.3;
+.carousel__track {
+  min-height: 480px;
 }
 
-.hero__subtitle {
-  font-size: var(--font-size-lg);
-  max-width: 600px;
-  margin: 0 auto 2rem;
-  opacity: 0.92;
-  line-height: 1.7;
-}
-
-.hero__actions {
+.carousel__slide {
+  min-height: 480px;
   display: flex;
-  gap: 1rem;
-  justify-content: center;
-  flex-wrap: wrap;
+  align-items: center;
+  background: linear-gradient(135deg, #0d9488 0%, #14b8a6 60%, #5c724e 100%);
+  background-size: cover;
+  background-position: center;
+  position: relative;
 }
 
-.hero .btn-outline {
-  border-color: #ffffff;
+/* Overlay sombre pour lisibilité sur photo */
+.carousel__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.2) 100%);
+}
+
+.carousel__slide--fallback {
+  background: linear-gradient(135deg, #0d9488 0%, #14b8a6 60%, #5c724e 100%);
+}
+
+.carousel__content {
+  position: relative;
+  z-index: 1;
+  padding: 4rem 1.5rem;
+  max-width: 680px;
+}
+
+.carousel__tag {
+  display: inline-block;
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(4px);
   color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  margin-bottom: 1rem;
 }
 
-.hero .btn-outline:hover {
+.carousel__title {
+  font-size: clamp(1.6rem, 4vw, 2.5rem);
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.3;
+  margin-bottom: 1rem;
+}
+
+.carousel__excerpt {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.95);
+  line-height: 1.7;
+  margin-bottom: 2rem;
+  max-width: 520px;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid rgba(255,255,255,0.3);
+}
+
+.carousel__btn {
   background-color: #ffffff;
-  color: var(--color-primary);
+  color: var(--color-primary-dark);
+  font-weight: 700;
+  padding: 0.75rem 1.75rem;
+  border-radius: var(--border-radius);
+  text-decoration: none;
+  display: inline-block;
+  transition: background-color var(--transition), transform var(--transition);
 }
 
-/* Features */
+.carousel__btn:hover {
+  background-color: var(--color-surface-teal);
+  transform: translateY(-2px);
+}
+
+/* Contrôles */
+.carousel__controls {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  z-index: 2;
+}
+
+.carousel__arrow {
+  background: rgba(255,255,255,0.25);
+  backdrop-filter: blur(4px);
+  border: none;
+  color: #ffffff;
+  font-size: 1.5rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color var(--transition);
+  line-height: 1;
+}
+
+.carousel__arrow:hover {
+  background: rgba(255,255,255,0.45);
+}
+
+.carousel__dots {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.carousel__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,0.45);
+  cursor: pointer;
+  padding: 0;
+  transition: background-color var(--transition), transform var(--transition);
+}
+
+.carousel__dot.active {
+  background: #ffffff;
+  transform: scale(1.3);
+}
+
+/* Transition slide */
+.slide-enter-active,
+.slide-leave-active {
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.slide-enter-from {
+  opacity: 0;
+  transform: translateX(40px);
+}
+.slide-leave-to {
+  opacity: 0;
+  transform: translateX(-40px);
+}
+
+/* ========================
+   FEATURES
+   ======================== */
 .features {
   padding: 4rem 0;
 }
@@ -138,7 +353,9 @@
   padding: 0 1.5rem 1.5rem;
 }
 
-/* CTA */
+/* ========================
+   CTA
+   ======================== */
 .cta {
   background: linear-gradient(135deg, #ccfbf1 0%, #d1fae5 100%);
   padding: 3.5rem 0;
@@ -176,7 +393,8 @@
 }
 
 @media (max-width: 600px) {
-  .hero__title { font-size: 1.6rem; }
-  .hero { padding: 3rem 0; }
+  .carousel__track,
+  .carousel__slide { min-height: 380px; }
+  .carousel__title { font-size: 1.5rem; }
 }
 </style>

@@ -1,3 +1,13 @@
+<script setup>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+const menuOpen = ref(false)
+const router = useRouter()
+
+router.afterEach(() => { menuOpen.value = false })
+</script>
+
 <template>
   <header class="navbar">
     <div class="container navbar__inner">
@@ -26,14 +36,41 @@
         <span class="navbar__logo-text">CESIZen</span>
       </router-link>
 
-      <!-- Navigation -->
-      <nav aria-label="Navigation principale">
+      <!-- Menu horizontal (desktop) -->
+      <nav class="navbar__nav" aria-label="Navigation principale">
         <ul class="navbar__links">
           <li><router-link to="/">Accueil</router-link></li>
-          <li><router-link to="/login" class="btn btn-primary navbar__cta">Connexion</router-link></li>
+          <li><router-link to="/activities">Activités de détente</router-link></li>
+          <li><router-link to="/prevention">Santé mentale</router-link></li>
         </ul>
       </nav>
 
+      <!-- Bouton connexion + hamburger -->
+      <div class="navbar__right">
+        <router-link to="/login" class="btn btn-primary navbar__cta">Mon compte</router-link>
+
+        <button
+          class="hamburger"
+          @click="menuOpen = !menuOpen"
+          :aria-expanded="menuOpen"
+          aria-label="Ouvrir le menu"
+        >
+          <span :class="['hamburger__bar', { open: menuOpen }]"></span>
+          <span :class="['hamburger__bar', { open: menuOpen }]"></span>
+          <span :class="['hamburger__bar', { open: menuOpen }]"></span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Menu déroulant mobile -->
+    <div v-if="menuOpen" class="mobile-menu">
+      <ul>
+        <li><router-link to="/">Accueil</router-link></li>
+        <li><router-link to="/activities">Activités de détente</router-link></li>
+        <li><router-link to="/prevention">Santé mentale</router-link></li>
+        <li><router-link to="/login">Connexion</router-link></li>
+      </ul>
     </div>
   </header>
 
@@ -46,7 +83,6 @@
     <!-- Logo centré -->
     <div class="footer__logo-wrap">
       <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="footer__logo-icon" aria-hidden="true">
-
         <defs>
           <linearGradient id="fBg" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stop-color="#f0fdfa"/>
@@ -81,6 +117,8 @@
         <h4>Navigation</h4>
         <ul>
           <li><router-link to="/">Accueil</router-link></li>
+          <li><router-link to="/activities">Activités de détente</router-link></li>
+          <li><router-link to="/prevention">Santé mentale</router-link></li>
           <li><router-link to="/login">Connexion</router-link></li>
         </ul>
       </div>
@@ -103,11 +141,12 @@
 </template>
 
 <style>
-/* Navbar */
+/* ========================
+   NAVBAR
+   ======================== */
 .navbar {
   background-color: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
-  padding: 0.75rem 0;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -117,6 +156,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 1rem 1.5rem;
+  gap: 1.5rem;
 }
 
 .navbar__logo {
@@ -124,12 +165,10 @@
   align-items: center;
   gap: 0.6rem;
   text-decoration: none;
+  flex-shrink: 0;
 }
 
-.navbar__logo-icon {
-  width: 40px;
-  height: 40px;
-}
+.navbar__logo-icon { width: 40px; height: 40px; }
 
 .navbar__logo-text {
   font-size: var(--font-size-lg);
@@ -137,45 +176,120 @@
   color: var(--color-text);
 }
 
+/* Liens horizontaux */
+.navbar__nav { flex: 1; }
+
 .navbar__links {
   list-style: none;
   display: flex;
   align-items: center;
-  gap: 2rem;
+  gap: 0.5rem;
 }
 
 .navbar__links a {
   text-decoration: none;
   color: var(--color-text);
   font-weight: 500;
-  transition: color var(--transition);
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--border-radius);
+  transition: background-color var(--transition), color var(--transition);
 }
 
 .navbar__links a:hover {
+  background-color: var(--color-surface-teal);
   color: var(--color-primary);
 }
 
-.navbar__links a.router-link-active:not(.navbar__cta) {
-  color: var(--color-primary);
+.navbar__links a.router-link-active {
+  background-color: var(--color-surface-teal);
+  color: var(--color-primary-dark);
   font-weight: 600;
 }
 
-.navbar__cta {
-  padding: 0.5rem 1.25rem !important;
-  font-size: 0.9rem !important;
-  font-weight: 700 !important;
-  letter-spacing: 0.02em;
-  color: #ffffff !important;
+/* Côté droit : bouton + hamburger */
+.navbar__right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
 }
 
-/* Footer */
+.navbar__cta {
+  padding: 0.45rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #ffffff !important;
+  text-decoration: none;
+}
+
+/* Hamburger (caché sur desktop) */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.hamburger__bar {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background-color: var(--color-text);
+  border-radius: 2px;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.hamburger__bar.open:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger__bar.open:nth-child(2) { opacity: 0; }
+.hamburger__bar.open:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* Menu déroulant mobile */
+.mobile-menu {
+  background-color: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  padding: 0.5rem 0;
+}
+
+.mobile-menu ul {
+  list-style: none;
+}
+
+.mobile-menu a {
+  display: block;
+  padding: 0.85rem 1.5rem;
+  text-decoration: none;
+  color: var(--color-text);
+  font-weight: 500;
+  transition: background-color var(--transition), color var(--transition);
+}
+
+.mobile-menu a:hover,
+.mobile-menu a.router-link-active {
+  background-color: var(--color-surface-teal);
+  color: var(--color-primary);
+}
+
+/* ========================
+   RESPONSIVE MOBILE
+   ======================== */
+@media (max-width: 768px) {
+  .navbar__nav { display: none; }
+  .hamburger { display: flex; }
+  .navbar__cta { display: none; }
+}
+
+/* ========================
+   FOOTER
+   ======================== */
 .footer {
   background: linear-gradient(180deg, #0d9488 0%, #0f766e 100%);
   margin-top: 4rem;
   color: #ffffff;
 }
 
-/* Logo centré */
 .footer__logo-wrap {
   display: flex;
   flex-direction: column;
@@ -183,11 +297,7 @@
   padding: 2.5rem 0;
 }
 
-.footer__logo-icon {
-  width: 50px;
-  height: 50px;
-  margin-bottom: 0.5rem;
-}
+.footer__logo-icon { width: 50px; height: 50px; margin-bottom: 0.5rem; }
 
 .footer__logo-name {
   font-size: var(--font-size-xl);
@@ -201,7 +311,6 @@
   margin-top: 0.25rem;
 }
 
-/* Séparateurs harmonisés */
 .footer__divider {
   width: 80%;
   margin: 0 auto;
@@ -209,7 +318,6 @@
   border-top: 1px solid rgba(255,255,255,0.2);
 }
 
-/* Colonnes */
 .footer__inner {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr;
@@ -246,9 +354,7 @@
   transition: color var(--transition);
 }
 
-.footer__col ul a:hover {
-  color: var(--color-primary);
-}
+.footer__col ul a:hover { color: #ffffff; }
 
 .footer__bottom {
   padding: 1rem 1.5rem;
@@ -258,8 +364,6 @@
 }
 
 @media (max-width: 700px) {
-  .footer__inner {
-    grid-template-columns: 1fr;
-  }
+  .footer__inner { grid-template-columns: 1fr; }
 }
 </style>
