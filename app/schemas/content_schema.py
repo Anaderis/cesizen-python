@@ -117,6 +117,7 @@ class ActivityOut(BaseModel):
     title: str
     description: str | None = None
     url: str | None = None
+    photo: str | None = None
     duration: str | None = None
     active: bool
     category_id: int
