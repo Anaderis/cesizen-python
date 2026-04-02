@@ -61,6 +61,7 @@ class Activity(Base):
     title = Column(String(255), nullable=False)
     description = Column(Text)
     url = Column(String(500))
+    photo = Column(String(255))       # nom du fichier image pour PDF/audio (ex: meditation.jpg)
     duration = Column(String(20))
     active = Column(Boolean, default=True)
 
