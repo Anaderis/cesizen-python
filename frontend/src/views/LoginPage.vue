@@ -122,6 +122,9 @@
 
 <script setup>
 import { ref, reactive } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 // Onglet actif : 'login' ou 'register'
 const activeTab = ref('login')
@@ -142,7 +145,7 @@ async function handleLogin() {
   message.text = ''
 
   try {
-    const response = await fetch('http://localhost:8000/api/auth/login', {
+    const response = await fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(loginForm),
@@ -153,9 +156,7 @@ async function handleLogin() {
     if (response.ok) {
       // On stocke le token pour les prochaines requêtes
       localStorage.setItem('token', data.access_token)
-      message.text = data.message || 'Connexion réussie !'
-      message.type = 'success'
-      // TODO : rediriger vers le tableau de bord
+      router.push('/activities')
     } else {
       message.text = data.detail || 'Email ou mot de passe incorrect.'
       message.type = 'error'
@@ -174,7 +175,7 @@ async function handleRegister() {
   message.text = ''
 
   try {
-    const response = await fetch('http://localhost:8000/api/users/create', {
+    const response = await fetch('/api/users/create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(registerForm),

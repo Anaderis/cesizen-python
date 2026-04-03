@@ -5,7 +5,18 @@ import { useRouter } from 'vue-router'
 const menuOpen = ref(false)
 const router = useRouter()
 
-router.afterEach(() => { menuOpen.value = false })
+const isLoggedIn = ref(!!localStorage.getItem('token'))
+
+router.afterEach(() => {
+  menuOpen.value = false
+  isLoggedIn.value = !!localStorage.getItem('token')
+})
+
+function logout() {
+  localStorage.removeItem('token')
+  isLoggedIn.value = false
+  router.push('/login')
+}
 </script>
 
 <template>
@@ -47,7 +58,11 @@ router.afterEach(() => { menuOpen.value = false })
 
       <!-- Bouton connexion + hamburger -->
       <div class="navbar__right">
-        <router-link to="/login" class="btn btn-primary navbar__cta">Mon compte</router-link>
+        <template v-if="isLoggedIn">
+          <router-link to="/account" class="btn btn-primary navbar__cta">Mon compte</router-link>
+          <button @click="logout" class="btn btn-logout navbar__cta">Se déconnecter</button>
+        </template>
+        <router-link v-else to="/login" class="btn btn-primary navbar__cta">Mon compte</router-link>
 
         <button
           class="hamburger"
@@ -220,6 +235,16 @@ router.afterEach(() => { menuOpen.value = false })
   font-weight: 700;
   color: #ffffff !important;
   text-decoration: none;
+}
+.btn-logout {
+  background-color: transparent;
+  border: 2px solid var(--color-primary);
+  color: var(--color-primary) !important;
+  cursor: pointer;
+}
+.btn-logout:hover {
+  background-color: var(--color-primary);
+  color: #ffffff !important;
 }
 
 /* Hamburger (caché sur desktop) */
