@@ -10,7 +10,8 @@
       "WebSearch",
       "WebFetch(domain:aaru5h.github.io)",
       "WebFetch(domain:sanchariiii.github.io)",
-      "WebFetch(domain:amalkrishnanvp.github.io)"
+      "WebFetch(domain:amalkrishnanvp.github.io)",
+      "Bash(python3 -c ':*)"
     ]
   }
 }

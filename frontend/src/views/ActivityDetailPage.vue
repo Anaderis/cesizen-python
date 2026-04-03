@@ -33,6 +33,15 @@
         </div>
         <h1 class="activity-detail__title">{{ activity.title }}</h1>
         <p v-if="activity.description" class="activity-detail__description">{{ activity.description }}</p>
+
+        <!-- Bouton favori (utilisateur connecté uniquement) -->
+        <button
+          v-if="isLoggedIn"
+          @click="toggleFavorite"
+          :class="['btn', 'btn-favorite', { 'btn-favorite--active': isFavorite }]"
+        >
+          {{ isFavorite ? '♥ Retirer des favoris' : '♡ Ajouter aux favoris' }}
+        </button>
       </header>
 
       <!-- ===== VIDÉO YouTube ===== -->
@@ -103,12 +112,28 @@ const route    = useRoute()
 const activity = ref(null)
 const loading  = ref(true)
 const error    = ref(null)
+const isFavorite = ref(false)
+
+const isLoggedIn = !!localStorage.getItem('token')
+
+function authHeaders() {
+  return { 'Authorization': `Bearer ${localStorage.getItem('token')}`, 'Content-Type': 'application/json' }
+}
 
 onMounted(async () => {
   try {
     const res = await fetch(`/api/activities/${route.params.id}`)
     if (!res.ok) throw new Error('Activité introuvable.')
     activity.value = await res.json()
+
+    // Vérifie si déjà en favori
+    if (isLoggedIn) {
+      const favRes = await fetch('/api/users/me/favorites', { headers: authHeaders() })
+      if (favRes.ok) {
+        const favs = await favRes.json()
+        isFavorite.value = favs.some(f => f.id === activity.value.id)
+      }
+    }
   } catch (e) {
     error.value = e.message
   } finally {
@@ -140,6 +165,12 @@ const youtubeEmbedUrl = computed(() => {
   if (url.includes('youtube.com/embed/')) return url
   return null
 })
+
+async function toggleFavorite() {
+  const method = isFavorite.value ? 'DELETE' : 'POST'
+  const res = await fetch(`/api/activities/${activity.value.id}/favorite`, { method, headers: authHeaders() })
+  if (res.ok) isFavorite.value = !isFavorite.value
+}
 </script>
 
 <style scoped>
@@ -222,6 +253,26 @@ const youtubeEmbedUrl = computed(() => {
   font-size: 1rem;
   color: var(--color-text-muted);
   line-height: 1.7;
+}
+.btn-favorite {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 1rem;
+  padding: 0.5rem 1.25rem;
+  border: 2px solid var(--color-primary);
+  border-radius: var(--border-radius);
+  background: transparent;
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color var(--transition), color var(--transition);
+}
+.btn-favorite:hover,
+.btn-favorite--active {
+  background-color: var(--color-primary);
+  color: #ffffff;
 }
 
 /* ===== Media ===== */
