@@ -49,6 +49,15 @@
         </div>
       </div>
 
+      <!-- ===================== BARRE D'ACTIONS ADMIN ===================== -->
+      <div v-if="user?.role_id === 2" class="admin-actions-bar">
+        <div class="container">
+          <button @click="exportLogs" class="btn btn-sm btn-outline">
+            ⬇ Récupérer les logs Administrateur
+          </button>
+        </div>
+      </div>
+
       <!-- ===================== ONGLET 1 : MON COMPTE ===================== -->
       <div v-show="activeTab === 'account'" class="container account-layout">
 
@@ -839,6 +848,9 @@ async function createUser() {
       createUserMessage.type = 'success'
       Object.assign(createUserForm, { name: '', surname: '', email: '', phone: '', password: '', role_id: 1 })
       await loadUsers()
+    } else if (res.status === 409) {
+      createUserMessage.text = 'Un compte existe déjà avec cette adresse e-mail.'
+      createUserMessage.type = 'error'
     } else {
       const detail = data.detail
       createUserMessage.text = Array.isArray(detail) ? detail.map(e => e.msg).join(' — ') : (detail || 'Erreur.')
@@ -1071,6 +1083,20 @@ async function saveEdit() {
   }
 }
 
+// ── Export logs ───────────────────────────────────────────────
+async function exportLogs() {
+  const res = await fetch('/api/logs/export', { headers: authHeaders() })
+  if (!res.ok) return
+  const text = await res.text()
+  const blob = new Blob([text], { type: 'text/plain' })
+  const url  = URL.createObjectURL(blob)
+  const a    = document.createElement('a')
+  a.href     = url
+  a.download = `logs-admin-${new Date().toISOString().slice(0, 10)}.txt`
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
 // ── Chargement paresseux des onglets admin ────────────────────
 watch(activeTab, (tab) => {
   if (tab === 'users'      && !usersLoaded.value)      loadUsers()
@@ -1135,6 +1161,10 @@ watch(activeTab, (tab) => {
   display: flex;
   gap: 0;
   overflow-x: auto;
+  scrollbar-width: none;
+}
+.tabs-nav__inner::-webkit-scrollbar {
+  display: none;
 }
 .tab-btn {
   padding: 1rem 1.5rem;
@@ -1313,6 +1343,14 @@ watch(activeTab, (tab) => {
 
 /* ── RGPD ────────────────────────────────────────────────── */
 .rgpd-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+/* ── Barre d'actions admin ───────────────────────────────── */
+.admin-actions-bar {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  padding: 0.6rem 0;
+}
+.admin-actions-bar .container { display: flex; justify-content: flex-end; }
 
 /* ── Admin : en-tête de section ─────────────────────────── */
 .admin-section-header {

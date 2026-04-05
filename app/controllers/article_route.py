@@ -4,6 +4,7 @@ from app.services.content_service import (
     get_all_articles, get_article_by_id, get_articles_by_category, update_article
 )
 from app.dependencies import require_admin
+from app.services.log_service import write_log
 
 route = APIRouter(prefix="/articles", tags=["Articles"])
 
@@ -36,8 +37,9 @@ def get_article_endpoint(id: int):
 
 # PUT : Modifier un article → admin uniquement
 @route.put("/{id}")
-def update_article_endpoint(id: int, article: ArticleUpdate, _: dict = Depends(require_admin)):
+def update_article_endpoint(id: int, article: ArticleUpdate, current_user: dict = Depends(require_admin)):
     updated = update_article(id, article)
     if not updated:
         raise HTTPException(status_code=404, detail="Article non trouvé")
+    write_log(current_user["id"], "Modification article", f"ID:{id} - {updated.title}")
     return {"message": "Article modifié", "article": ArticleOut.model_validate(updated)}

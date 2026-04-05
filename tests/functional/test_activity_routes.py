@@ -2,7 +2,6 @@
 Tests fonctionnels des routes activités.
 Vérifie les droits d'accès et le filtrage actif/inactif.
 """
-import pytest
 from unittest.mock import patch
 from types import SimpleNamespace
 
@@ -92,3 +91,66 @@ class TestDeactivateActivity:
         """DELETE /activities/{id} ne doit pas exister (cahier des charges)."""
         response = client.delete("/api/activities/1", headers=admin_headers)
         assert response.status_code == 405  # Method Not Allowed
+
+
+class TestUpdateActivity:
+
+    def test_update_activity_as_admin(self, client, admin_headers):
+        """PUT /activities/{id} en tant qu'admin retourne 200."""
+        with patch("app.controllers.activity_route.update_activity", return_value=fake_activity()):
+            response = client.put("/api/activities/1", headers=admin_headers, json={
+                "title": "Nouveau titre"
+            })
+        assert response.status_code == 200
+
+    def test_update_activity_as_user(self, client, user_headers):
+        """PUT /activities/{id} en tant qu'utilisateur standard retourne 403."""
+        response = client.put("/api/activities/1", headers=user_headers, json={
+            "title": "Nouveau titre"
+        })
+        assert response.status_code == 403
+
+    def test_update_activity_without_token(self, client):
+        """PUT /activities/{id} sans token retourne 401."""
+        response = client.put("/api/activities/1", json={"title": "Nouveau titre"})
+        assert response.status_code == 401
+
+    def test_update_activity_invalid_url(self, client, admin_headers):
+        """PUT /activities/{id} avec une URL invalide retourne 422."""
+        response = client.put("/api/activities/1", headers=admin_headers, json={
+            "url": "static/pdf/"
+        })
+        assert response.status_code == 422
+
+    def test_update_activity_static_directory_url_rejected(self, client, admin_headers):
+        """PUT /activities/{id} avec un chemin statique sans extension retourne 422."""
+        response = client.put("/api/activities/1", headers=admin_headers, json={
+            "url": "/static/pdf/"
+        })
+        assert response.status_code == 422
+
+
+class TestCreateActivityUrlValidation:
+
+    def test_create_activity_invalid_url(self, client, admin_headers):
+        """POST /activities/create avec une URL invalide retourne 422."""
+        response = client.post("/api/activities/create", headers=admin_headers, json={
+            "title": "Pilates",
+            "url": "static/pdf/",
+            "active": True,
+            "category_id": 1,
+            "format_id": 1
+        })
+        assert response.status_code == 422
+
+    def test_create_activity_valid_static_url(self, client, admin_headers):
+        """POST /activities/create avec un chemin /static/ valide est accepté."""
+        with patch("app.controllers.activity_route.create_activity", return_value=fake_activity()):
+            response = client.post("/api/activities/create", headers=admin_headers, json={
+                "title": "Exercice PDF",
+                "url": "/static/pdf/exercice.pdf",
+                "active": True,
+                "category_id": 1,
+                "format_id": 1
+            })
+        assert response.status_code == 200

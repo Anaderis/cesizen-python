@@ -187,6 +187,10 @@ async function handleRegister() {
       message.text = 'Compte créé ! Vous pouvez maintenant vous connecter.'
       message.type = 'success'
       activeTab.value = 'login'
+    } else if (response.status === 409) {
+      message.text = 'Un compte existe déjà avec cette adresse e-mail. Veuillez vous connecter.'
+      message.type = 'error'
+      activeTab.value = 'login'
     } else {
       // Gère les erreurs de validation Pydantic
       const detail = data.detail
