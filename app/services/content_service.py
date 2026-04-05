@@ -59,8 +59,7 @@ def update_article(article_id: int, article_data):
         for field, value in fields.items():
             setattr(article, field, value)
         db.commit()
-        db.refresh(article)
-        return article
+        return db.query(ArticleSante).options(joinedload(ArticleSante.category)).filter(ArticleSante.id == article_id).first()
     finally:
         db.close()
 
@@ -210,8 +209,13 @@ def remove_favorite(user_id: int, activity_id: int):
 def get_user_favorites(user_id: int):
     db = SessionLocal()
     try:
-        favorites = db.query(Favorites).filter(Favorites.user_id == user_id).all()
-        return [f.activity for f in favorites]
+        return (
+            db.query(Activity)
+            .options(joinedload(Activity.category), joinedload(Activity.format))
+            .join(Favorites, Favorites.activity_id == Activity.id)
+            .filter(Favorites.user_id == user_id)
+            .all()
+        )
     finally:
         db.close()
 
