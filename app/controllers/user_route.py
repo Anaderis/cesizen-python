@@ -4,6 +4,7 @@ from app.schemas.content_schema import ActivityOut
 from app.services.user_service import get_all_users, get_user_by_id, create_user, update_user, delete_user
 from app.services.content_service import get_user_favorites
 from app.dependencies import require_admin, require_user
+from app.services.log_service import write_log
 
 route = APIRouter(prefix="/users", tags=["Users"])
 
@@ -37,7 +38,10 @@ def get_user_id_endpoint(id: int, current_user: dict = Depends(require_user)):
 # POST : Créer un utilisateur → public (pas de Depends)
 @route.post("/create")
 def create_user_endpoint(user: UserCreate):
-    created = create_user(user)
+    try:
+        created = create_user(user)
+    except ValueError as e:
+        raise HTTPException(status_code=409, detail=str(e))
     return {"message": "Utilisateur créé", "user": UserOut.model_validate(created)}
 
 
@@ -49,6 +53,8 @@ def update_user_endpoint(id: int, user: UserUpdate, current_user: dict = Depends
     updated = update_user(id, user)
     if not updated:
         raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+    if current_user["role_id"] == 2 and current_user["id"] != id:
+        write_log(current_user["id"], "Modification utilisateur", f"ID:{id} - {updated.email}")
     return {"message": "Utilisateur modifié", "user": UserOut.model_validate(updated)}
 
 
@@ -60,6 +66,8 @@ def deactivate_user_endpoint(id: int, current_user: dict = Depends(require_user)
     deactivated = update_user(id, UserUpdate(is_active=False))
     if not deactivated:
         raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+    if current_user["role_id"] == 2 and current_user["id"] != id:
+        write_log(current_user["id"], "Désactivation utilisateur", f"ID:{id} - {deactivated.email}")
     return {"message": "Utilisateur désactivé", "user": UserOut.model_validate(deactivated)}
 
 
@@ -71,4 +79,6 @@ def delete_user_endpoint(id: int, current_user: dict = Depends(require_user)):
     deleted = delete_user(id)
     if not deleted:
         raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+    if current_user["role_id"] == 2 and current_user["id"] != id:
+        write_log(current_user["id"], "Suppression utilisateur", f"ID:{id} - {deleted.email}")
     return {"message": "Utilisateur supprimé"}

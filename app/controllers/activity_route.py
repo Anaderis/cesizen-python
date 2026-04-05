@@ -6,6 +6,7 @@ from app.services.content_service import (
     add_favorite, remove_favorite
 )
 from app.dependencies import require_admin, require_user
+from app.services.log_service import write_log
 
 route = APIRouter(prefix="/activities", tags=["Activities"])
 
@@ -45,26 +46,29 @@ def get_activity_endpoint(id: int):
 
 # POST : Créer une activité → admin uniquement
 @route.post("/create")
-def create_activity_endpoint(activity: ActivityCreate, _: dict = Depends(require_admin)):
+def create_activity_endpoint(activity: ActivityCreate, current_user: dict = Depends(require_admin)):
     created = create_activity(activity)
+    write_log(current_user["id"], "Création activité", f"ID:{created.id} - {created.title}")
     return {"message": "Activité créée", "activity": ActivityOut.model_validate(created)}
 
 
-# PUT : Modifier une activité → admin uniquement
+# PUT : Désactiver une activité → admin uniquement (pas de DELETE)
 @route.put("/deactivate/{id}")
-def deactivate_activity_endpoint(id: int, _: dict = Depends(require_admin)):
+def deactivate_activity_endpoint(id: int, current_user: dict = Depends(require_admin)):
     deactivated = update_activity(id, ActivityUpdate(active=False))
     if not deactivated:
         raise HTTPException(status_code=404, detail="Activité non trouvée")
+    write_log(current_user["id"], "Désactivation activité", f"ID:{id} - {deactivated.title}")
     return {"message": "Activité désactivée", "activity": ActivityOut.model_validate(deactivated)}
 
 
-# PUT : Désactiver une activité → admin uniquement (pas de DELETE)
+# PUT : Modifier une activité → admin uniquement
 @route.put("/{id}")
-def update_activity_endpoint(id: int, activity: ActivityUpdate, _: dict = Depends(require_admin)):
+def update_activity_endpoint(id: int, activity: ActivityUpdate, current_user: dict = Depends(require_admin)):
     updated = update_activity(id, activity)
     if not updated:
         raise HTTPException(status_code=404, detail="Activité non trouvée")
+    write_log(current_user["id"], "Modification activité", f"ID:{id} - {updated.title}")
     return {"message": "Activité modifiée", "activity": ActivityOut.model_validate(updated)}
 
 

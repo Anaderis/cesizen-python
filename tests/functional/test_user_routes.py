@@ -84,3 +84,70 @@ class TestDeleteUser:
         """DELETE /users/{id} sans token retourne 401."""
         response = client.delete("/api/users/5")
         assert response.status_code == 401
+
+
+class TestGetFavorites:
+
+    def test_get_favorites_with_token(self, client, user_headers):
+        """GET /users/me/favorites avec token retourne 200."""
+        with patch("app.controllers.user_route.get_user_favorites", return_value=[]):
+            response = client.get("/api/users/me/favorites", headers=user_headers)
+        assert response.status_code == 200
+
+    def test_get_favorites_without_token(self, client):
+        """GET /users/me/favorites sans token retourne 401."""
+        response = client.get("/api/users/me/favorites")
+        assert response.status_code == 401
+
+
+class TestUpdateUser:
+
+    def test_update_own_account_as_user(self, client, user_headers):
+        """PUT /users/{id} comme user sur son propre compte (id=998) retourne 200."""
+        with patch("app.controllers.user_route.update_user", return_value=fake_user(id=998)):
+            response = client.put("/api/users/998", headers=user_headers, json={"name": "Bob"})
+        assert response.status_code == 200
+
+    def test_update_other_account_as_user(self, client, user_headers):
+        """PUT /users/{id} comme user sur un autre compte retourne 403."""
+        response = client.put("/api/users/5", headers=user_headers, json={"name": "Bob"})
+        assert response.status_code == 403
+
+    def test_update_any_account_as_admin(self, client, admin_headers):
+        """PUT /users/{id} comme admin peut modifier n'importe quel compte (role, statut)."""
+        with patch("app.controllers.user_route.update_user", return_value=fake_user(id=5, role_id=2)):
+            response = client.put("/api/users/5", headers=admin_headers, json={
+                "role_id": 2,
+                "is_active": False
+            })
+        assert response.status_code == 200
+
+    def test_update_without_token(self, client):
+        """PUT /users/{id} sans token retourne 401."""
+        response = client.put("/api/users/5", json={"name": "Bob"})
+        assert response.status_code == 401
+
+
+class TestDeactivateUser:
+
+    def test_deactivate_own_account_as_user(self, client, user_headers):
+        """PUT /users/deactivate/{id} comme user sur son propre compte (id=998) retourne 200."""
+        with patch("app.controllers.user_route.update_user", return_value=fake_user(id=998)):
+            response = client.put("/api/users/deactivate/998", headers=user_headers)
+        assert response.status_code == 200
+
+    def test_deactivate_other_account_as_user(self, client, user_headers):
+        """PUT /users/deactivate/{id} comme user sur un autre compte retourne 403."""
+        response = client.put("/api/users/deactivate/5", headers=user_headers)
+        assert response.status_code == 403
+
+    def test_deactivate_any_account_as_admin(self, client, admin_headers):
+        """PUT /users/deactivate/{id} comme admin sur n'importe quel compte retourne 200."""
+        with patch("app.controllers.user_route.update_user", return_value=fake_user(id=5)):
+            response = client.put("/api/users/deactivate/5", headers=admin_headers)
+        assert response.status_code == 200
+
+    def test_deactivate_without_token(self, client):
+        """PUT /users/deactivate/{id} sans token retourne 401."""
+        response = client.put("/api/users/deactivate/5")
+        assert response.status_code == 401

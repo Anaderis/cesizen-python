@@ -62,10 +62,13 @@ def get_user_by_id(user_id: int):
 def create_user(user_data):
     db = SessionLocal()
     try:
+        if db.query(User).filter(User.email == user_data.email).first():
+            raise ValueError("Un compte existe déjà avec cette adresse e-mail.")
+
         #---gensalt--- : génère un sel (une chaîne de caractères) aléatoire pour le hashage du mot de passe
         #   si deux utilisateurs ont le même mot de passe, ils auront des hash différents grâce au sel unique
         #---hashpw--- : prend le mot de passe en clair et le sel pour produire un hash sécurisé.
-        #---bcrypt--- travaille avec des bytes pas des strings, d'où l'encodage en utf-8 avant le hashage 
+        #---bcrypt--- travaille avec des bytes pas des strings, d'où l'encodage en utf-8 avant le hashage
         # et le décodage après pour stocker en string dans la DB.
 
         hashed_password = bcrypt.hashpw(user_data.password.encode("utf-8"), bcrypt.gensalt())
