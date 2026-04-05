@@ -11,6 +11,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from jose import jwt
 from datetime import datetime, timedelta, timezone
+from unittest.mock import patch
 
 from app.main import app as fastapi_app
 from app.database import Base, SessionLocal
@@ -106,3 +107,18 @@ def admin_headers(admin_token):
 @pytest.fixture(scope="session")
 def user_headers(user_token):
     return {"Authorization": f"Bearer {user_token}"}
+
+
+# ========================
+# MOCK WRITE_LOG
+# ========================
+# write_log utilise SessionLocal (PostgreSQL) et non la BDD de test SQLite.
+# On le neutralise automatiquement pour tous les tests afin d'éviter les
+# tentatives de connexion à PostgreSQL lors des tests fonctionnels.
+
+@pytest.fixture(autouse=True)
+def mock_write_log():
+    with patch("app.controllers.activity_route.write_log"), \
+         patch("app.controllers.article_route.write_log"), \
+         patch("app.controllers.user_route.write_log"):
+        yield
