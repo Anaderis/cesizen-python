@@ -12,8 +12,8 @@ const routes = [
   { path: '/',                    component: HomePage           },
   { path: '/login',               component: LoginPage          },
   { path: '/account',             component: AccountPage,        meta: { requiresAuth: true } },
-  { path: '/activities',          component: ActivitiesPage,     meta: { requiresAuth: true } },
-  { path: '/activities/:id',      component: ActivityDetailPage, meta: { requiresAuth: true } },
+  { path: '/activities',          component: ActivitiesPage     },
+  { path: '/activities/:id',      component: ActivityDetailPage },
   { path: '/prevention',          component: PreventionPage     },
   { path: '/prevention/:id',      component: ArticlePage        },
 ]

@@ -1,5 +1,6 @@
 from pydantic import BaseModel, ConfigDict, field_validator
 from datetime import date
+import os
 
 #from_attributes est utilisé pour permettre la conversion d'instances de classes ORM 
 # (comme celles de SQLAlchemy) en modèles Pydantic, qui utilise BaseModel.
@@ -78,6 +79,21 @@ class ArticleOut(BaseModel):
 # ========================
 # ACTIVITY
 # ========================
+def _validate_activity_url(value: str | None) -> str | None:
+    """URL externe (https://…) ou chemin de fichier statique (/static/… avec extension)."""
+    if value is None or value.strip() == '':
+        return None
+    url = value.strip()
+    if url.startswith('http://') or url.startswith('https://'):
+        return url
+    if url.startswith('/static/') and os.path.splitext(url)[1]:
+        return url
+    raise ValueError(
+        "L'URL doit être une adresse web (https://…) "
+        "ou un chemin de fichier statique avec extension (ex : /static/pdf/fichier.pdf)"
+    )
+
+
 class ActivityCreate(BaseModel):
     title: str
     description: str | None = None
@@ -92,6 +108,10 @@ class ActivityCreate(BaseModel):
         if not value.strip():
             raise ValueError("Le titre ne peut pas être vide")
         return value.strip()
+
+    @field_validator("url")
+    def valid_url(cls, value):
+        return _validate_activity_url(value)
 
 
 class ActivityUpdate(BaseModel):
@@ -110,6 +130,10 @@ class ActivityUpdate(BaseModel):
         if not value.strip():
             raise ValueError("Le titre ne peut pas être vide")
         return value.strip()
+
+    @field_validator("url")
+    def valid_url(cls, value):
+        return _validate_activity_url(value)
 
 
 class ActivityOut(BaseModel):
