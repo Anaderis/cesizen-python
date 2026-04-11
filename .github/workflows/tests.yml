@@ -27,8 +27,11 @@ jobs:
 
       # 4. Crée le fichier .env avec la clé secrète
       #    (stockée dans les secrets GitHub, jamais visible dans le code)
+      #    DATABASE_URL est fictive ici car les tests utilisent SQLite en mémoire
       - name: Créer le fichier .env
-        run: echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" > .env
+        run: |
+          echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" > .env
+          echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/cesizen" >> .env
 
       # 5. Lance les tests
       - name: Lancer les tests
