@@ -116,7 +116,6 @@ Django est un framework Python très complet qui fournit tous les outils essenti
 
 **Points forts :**
 - Très rapide à mettre en place grâce aux nombreux outils intégrés
-- Interface d'administration générée automatiquement, sans code supplémentaire. Django inclut nativement un back-office d'administration accessible à l'URL /admin. Dès qu'on déclare un modèle de données (par exemple User ou Article), Django génère automatiquement le CRUD associé
 - Framework stable, mature, avec une documentation très complète
 - Sécurité robuste par défaut (protection contre les attaques courantes)
 
@@ -139,11 +138,9 @@ FastAPI est un framework Python conçu pour créer des APIs. Vue.js 3 est un fra
 
 **Points forts :**
 - Très performant : FastAPI est l'un des frameworks Python les plus rapides
-- La validation des données est automatique, ce qui limite les erreurs et les données incorrectes. Si quelqu'un envoie une requête sans le champ email par exemple, ou avec un nombre à la place d'un texte, FastAPI rejette automatiquement la requête avec une erreur claire, sans qu'on ait besoin d'écrire de vérification manuelle dans le code.
 - Une documentation de l'API est générée automatiquement et consultable en ligne depuis /docs
 - L'interface Vue.js est fluide : la navigation ne recharge pas la page entière
 - La séparation entre l'interface et le serveur est claire, ce qui facilite les tests et la maintenance
-- L'ensemble du projet côté serveur est en Python, un seul langage à maîtriser
 
 **Points faibles :**
 - Nécessite de gérer deux projets distincts (backend et frontend), ce qui complexifie légèrement la mise en place initiale
@@ -165,36 +162,11 @@ Express.js est un framework pour Node.js, qui permet de créer des APIs en JavaS
 - JavaScript utilisé à la fois côté serveur et côté interface : un seul langage pour tout le projet
 - React est la bibliothèque frontend la plus utilisée dans l'industrie : nombreuses ressources disponibles
 - Interface fluide et réactive, sans rechargement de page
-- Grande flexibilité dans l'organisation du code
 
 **Points faibles :**
 - Express est minimaliste : il faut configurer manuellement beaucoup d'éléments (validation, sécurité, gestion des erreurs)
 - La sécurité par défaut est moins complète que celle de Django ou FastAPI
 - React a une courbe d'apprentissage plus difficile que Vue.js pour un projet de cette taille
-- La gestion de la base de données via Sequelize est moins intuitive que SQLAlchemy
-
----
-
-#### Architecture D — Quarkus (Java) + Qute
-
-**Description :**  
-Quarkus est un framework Java moderne, lancé en 2019 et soutenu par Red Hat. Il a été conçu dès le départ pour être léger, rapide à démarrer et économe en mémoire. Qute est son moteur de templates intégré, qui génère les pages HTML côté serveur — sans avoir besoin de JavaScript côté interface.
-
-- **Côté serveur (backend) :** Quarkus (Java)
-- **Côté interface (frontend) :** Qute — pages HTML générées par le serveur
-- **Base de données :** PostgreSQL (via Hibernate ORM)
-- **Connexion des utilisateurs :** JWT ou sessions, via l'extension Quarkus Security
-
-**Points forts :**
-- Très performant et léger : Quarkus démarre en quelques millisecondes et consomme peu de mémoire, ce qui le rend idéal pour un déploiement dans le cloud
-- Java est un langage largement utilisé dans les entreprises et les institutions publiques : les équipes techniques sont souvent familières avec cet écosystème
-- Soutenu par Red Hat, une entreprise reconnue : la pérennité du framework est assurée sur le long terme
-- Bonne intégration des tests avec JUnit et les extensions Quarkus dédiées aux tests
-
-**Points faibles :**
-- La courbe d'apprentissage est plus difficile, notamment pour quelqu'un qui ne connaît pas l'écosystème Java. Le langage Java est également "plus" verbeux que Python.
-- Qute génère les pages côté serveur comme Django Templates : l'interface manque de fluidité comparée à une application Vue.js ou React
-- La communauté de Quarkus, bien qu'active, est plus petite que celle de Spring Boot ou de FastAPI
 
 ---
 
@@ -216,16 +188,16 @@ Chaque architecture est notée de **1 à 5** pour chacun des critères ci-dessou
 
 ### 3.4 Tableau comparatif
 
-| Critère | Poids | Archi. A — Django + Templates | Archi. B — FastAPI + Vue.js 3 | Archi. C — Express + React | Archi. D — Quarkus + Qute |
-|---------|-------|:-----------------------------:|:------------------------------:|:---------------------------:|:-------------------------:|
-| Support et communauté | 15% | **5** | **4** | **4** | **3** |
-| Rapidité de développement | 20% | **5** | **4** | **3** | **2** |
-| Performance | 15% | **3** | **5** | **4** | **5** |
-| Sécurité | 15% | **5** | **4** | **3** | **4** |
-| Séparation interface / serveur | 10% | **2** | **5** | **5** | **2** |
-| Testabilité | 15% | **4** | **5** | **4** | **4** |
-| Qualité de l'interface utilisateur | 10% | **2** | **5** | **5** | **2** |
-| **Score** | **100%** | **3,75** | **4,55** | **3,85** | **3,35** |
+| Critère | Poids | Archi. A — Django + Templates | Archi. B — FastAPI + Vue.js 3 | Archi. C — Express + React |
+|---------|-------|:-----------------------------:|:------------------------------:|:---------------------------:|
+| Support et communauté | 15% | **5** | **4** | **4** |
+| Rapidité de développement | 20% | **5** | **4** | **3** |
+| Performance | 15% | **3** | **5** | **4** |
+| Sécurité | 15% | **5** | **4** | **3** |
+| Séparation interface / serveur | 10% | **2** | **5** | **5** |
+| Testabilité | 15% | **4** | **5** | **4** |
+| Qualité de l'interface utilisateur | 10% | **2** | **5** | **5** |
+| **Score** | **100%** | **3,75** | **4,55** | **3,85** |
 
 **Classement final :**
 
@@ -234,23 +206,6 @@ Chaque architecture est notée de **1 à 5** pour chacun des critères ci-dessou
 | 1er | FastAPI + Vue.js 3 | **4,55 / 5** |
 | 2ème | Express + React | **3,85 / 5** |
 | 3ème | Django + Templates | **3,75 / 5** |
-| 4ème | Quarkus + Qute | **3,35 / 5** |
-
----
-
-### 3.5 Analyse des résultats
-
-**Architecture A — Django + Templates (3,75 / 5)**  
-C'est la solution la plus simple et la plus rapide à mettre en place. Elle convient parfaitement à des projets où l'on veut aller vite et où l'interface n'a pas besoin d'être très dynamique. Cependant, le rendu serveur des pages HTML limite la fluidité de l'interface et rend difficile l'évolution indépendante du frontend et du backend. Pour CESIZen, qui nécessite une interface moderne et une API bien séparée, cette solution n'est pas la plus adaptée.
-
-**Architecture B — FastAPI + Vue.js 3 (4,55 / 5)**  
-C'est la solution la mieux notée. Elle combine les performances d'un framework Python moderne côté serveur avec la fluidité d'une interface construite dans le navigateur. La séparation claire entre l'API et l'interface facilite les tests, la maintenance et les évolutions futures. C'est l'architecture la plus cohérente avec les besoins du projet CESIZen.
-
-**Architecture C — Express + React (3,85 / 5)**  
-Cette solution est très répandue dans l'industrie et offre une interface fluide et moderne. Cependant, Express nécessite beaucoup de configuration manuelle pour des fonctionnalités que FastAPI ou Django intègrent nativement (sécurité, validation). React est également plus complexe à prendre en main que Vue.js pour un projet de cette échelle.
-
-**Architecture D — Quarkus + Qute (3,35 / 5)**  
-Quarkus est une solution très performante, particulièrement adaptée aux environnements cloud. Son appartenance à l'écosystème Java est particulièrement adaptée et prisée par les grandes organisations. Cependant, Java est plus verbeux que Python et la courbe d'apprentissage est plus longue. Le rendu des pages côté serveur avec Qute, comme pour Django Templates, ne permet pas d'obtenir une interface aussi fluide qu'avec Vue.js ou React. 
 
 ---
 
@@ -300,25 +255,7 @@ Lorsqu'un utilisateur se connecte, le serveur lui génère un jeton (token) qui 
 
 ---
 
-### 4.3 Stack technique complète
-
-| Composant | Technologie | Version | Rôle |
-|-----------|-------------|---------|------|
-| Backend | FastAPI | 0.115.x | Création de l'API REST |
-| Gestion BDD | SQLAlchemy | 2.x | Communication avec la base de données |
-| Validation | Pydantic | 2.x | Vérification et formatage des données |
-| Serveur | Uvicorn | 0.34.x | Exécution de l'application FastAPI |
-| Base de données | PostgreSQL | 16.x | Stockage des données |
-| Frontend | Vue.js 3 | 3.x | Interface utilisateur dans le navigateur |
-| Navigation | Vue Router | 4.x | Gestion des pages côté navigateur |
-| Authentification | JWT  | — | Jetons de connexion sécurisés |
-| Mots de passe | bcrypt | — | Chiffrement des mots de passe |
-| Tests | pytest + httpx | — | Tests unitaires et fonctionnels |
-| Automatisation | GitHub Actions | — | Exécution automatique des tests |
-
----
-
-### 4.4 Respect du pattern MVC
+### 4.3 Respect du pattern MVC
 
 L'architecture retenue respecte le Design Pattern **MVC (Modèle — Vue — Contrôleur)**, qui consiste à séparer clairement les trois grandes responsabilités d'une application :
 
@@ -512,10 +449,292 @@ Pour utiliser CESIZen au quotidien, voici l'ordre à suivre à chaque démarrage
 
 ## 6. Cahier de recette et scénarii de tests
 
-> *À rédiger*
+### 6.1 Contexte et périmètre
+
+Ce cahier de recette décrit les tests réalisés pour valider le bon fonctionnement de l'application CESIZen. Il couvre les fonctionnalités suivantes :
+
+| Fonctionnalité | Description |
+|---|---|
+| Authentification | Connexion par email et mot de passe |
+| Utilisateurs | Inscription, consultation, modification, désactivation, suppression |
+| Articles de santé | Consultation publique, modification par l'administrateur |
+| Activités bien-être | Consultation, création, modification, désactivation |
+| Favoris | Ajout et suppression de favoris par un utilisateur connecté |
+
+---
+
+### 6.2 Environnement de test
+
+Les tests sont exécutés avec la commande `pytest` depuis le dossier racine du projet. Ils utilisent une base de données temporaire, distincte de la base de production, qui est créée au lancement des tests et supprimée à la fin.
+
+Trois types de profils sont simulés pendant les tests :
+
+| Profil | Droits |
+|---|---|
+| Administrateur | Accès complet à toutes les fonctionnalités |
+| Utilisateur connecté | Accès à son propre compte et à ses favoris |
+| Visiteur (non connecté) | Accès aux contenus publics uniquement |
+
+---
+
+### 6.3 Tests unitaires
+
+Les tests unitaires vérifient des règles de validation précises, sans passer par l'application complète. Le responsable de tous les tests est le développeur back-end.
+
+#### TU-01 — Validation du formulaire d'inscription
+
+| ID | Scénario | Résultat attendu |
+|---|---|---|
+| TU-01-01 | Données valides | Compte créé sans erreur |
+| TU-01-02 | Email en majuscules | Email converti automatiquement en minuscules |
+| TU-01-03 | Email invalide | Erreur de validation |
+| TU-01-04 | Mot de passe trop court (< 8 caractères) | Erreur de validation |
+| TU-01-05 | Mot de passe sans majuscule | Erreur de validation |
+| TU-01-06 | Mot de passe sans chiffre | Erreur de validation |
+| TU-01-07 | Mot de passe sans caractère spécial | Erreur de validation |
+| TU-01-08 | Nom vide ou composé uniquement d'espaces | Erreur de validation |
+| TU-01-09 | Nom saisi avec des espaces autour | Espaces supprimés automatiquement |
+
+#### TU-02 — Validation de l'URL d'une activité
+
+| ID | Scénario | Résultat attendu |
+|---|---|---|
+| TU-02-01 | URL YouTube complète | Acceptée |
+| TU-02-02 | Lien court youtu.be | Accepté |
+| TU-02-03 | Chemin vers un fichier PDF interne | Accepté |
+| TU-02-04 | Chemin vers un fichier audio interne | Accepté |
+| TU-02-05 | Champ URL vide | Accepté (champ optionnel) |
+| TU-02-06 | Texte quelconque sans format valide | Erreur de validation |
+
+#### TU-03 — Connexion utilisateur
+
+| ID | Scénario | Résultat attendu |
+|---|---|---|
+| TU-03-01 | Email inconnu | Connexion refusée |
+| TU-03-02 | Mauvais mot de passe | Connexion refusée |
+| TU-03-03 | Identifiants corrects | Token de connexion retourné |
+
+#### TU-04 — Sécurité des mots de passe
+
+| ID | Scénario | Résultat attendu |
+|---|---|---|
+| TU-04-01 | Création de compte avec mot de passe en clair | Mot de passe chiffré et illisible en base |
+
+### 6.4 Tests fonctionnels
+
+Les tests fonctionnels vérifient le comportement des routes HTTP de l'API, notamment les codes de retour et les droits d'accès.
+
+#### TF-01 — Authentification
+
+| ID | Scénario | Résultat attendu |
+|---|---|---|
+| TF-01-01 | Connexion avec identifiants valides | 200 — token retourné |
+| TF-01-02 | Connexion avec mauvais identifiants | 401 — accès refusé |
+| TF-01-03 | Formulaire incomplet (email manquant) | 422 — données incomplètes |
+
+#### TF-02 — Gestion des utilisateurs
+
+| ID | Scénario | Résultat attendu |
+|---|---|---|
+| TF-02-01 | Consulter la liste (admin) | 200 — liste retournée |
+| TF-02-02 | Consulter la liste (utilisateur) | 403 — accès interdit |
+| TF-02-03 | Consulter la liste (visiteur) | 401 — non authentifié |
+| TF-02-04 | Créer un compte (public) | 200 — compte créé |
+| TF-02-05 | Créer un compte avec email invalide | 422 — données invalides |
+| TF-02-06 | Créer un compte avec mot de passe faible | 422 — données invalides |
+| TF-02-07 | Supprimer un compte (admin) | 200 — compte supprimé |
+| TF-02-08 | Supprimer un compte (visiteur) | 401 — non authentifié |
+| TF-02-09 | Modifier son propre compte | 200 — compte mis à jour |
+| TF-02-10 | Modifier le compte d'un autre utilisateur | 403 — accès interdit |
+| TF-02-11 | Modifier n'importe quel compte (admin) | 200 — compte mis à jour |
+| TF-02-12 | Modifier un compte (visiteur) | 401 — non authentifié |
+
+#### TF-03 — Désactivation de compte
+
+| ID | Scénario | Résultat attendu |
+|---|---|---|
+| TF-03-01 | Désactiver son propre compte | 200 — compte désactivé |
+| TF-03-02 | Désactiver le compte d'un autre | 403 — accès interdit |
+| TF-03-03 | Désactiver n'importe quel compte (admin) | 200 — compte désactivé |
+| TF-03-04 | Désactiver un compte (visiteur) | 401 — non authentifié |
+
+#### TF-04 — Favoris
+
+| ID | Scénario | Résultat attendu |
+|---|---|---|
+| TF-04-01 | Consulter ses favoris (connecté) | 200 — liste retournée |
+| TF-04-02 | Consulter ses favoris (visiteur) | 401 — non authentifié |
+
+#### TF-05 — Articles de santé
+
+| ID | Scénario | Résultat attendu |
+|---|---|---|
+| TF-05-01 | Consulter la liste des articles (public) | 200 — liste retournée |
+| TF-05-02 | Consulter un article (public) | 200 — détail retourné |
+| TF-05-03 | Consulter un article inexistant | 404 — non trouvé |
+| TF-05-04 | Modifier un article (admin) | 200 — article mis à jour |
+| TF-05-05 | Modifier un article (utilisateur) | 403 — accès interdit |
+
+#### TF-06 — Activités bien-être
+
+| ID | Scénario | Résultat attendu |
+|---|---|---|
+| TF-06-01 | Consulter les activités (public) | 200 — liste des activités actives |
+| TF-06-02 | Consulter toutes les activités (admin) | 200 — liste complète |
+| TF-06-03 | Consulter toutes les activités (utilisateur) | 403 — accès interdit |
+| TF-06-04 | Créer une activité (admin) | 200 — activité créée |
+| TF-06-05 | Créer une activité (utilisateur) | 403 — accès interdit |
+| TF-06-06 | Créer une activité (visiteur) | 401 — non authentifié |
+| TF-06-07 | Désactiver une activité (admin) | 200 — activité désactivée |
+| TF-06-08 | Modifier une activité (admin) | 200 — activité mise à jour |
+| TF-06-09 | Modifier une activité (utilisateur) | 403 — accès interdit |
+| TF-06-10 | Modifier une activité (visiteur) | 401 — non authentifié |
+| TF-06-11 | Créer une activité avec URL invalide | 422 — données invalides |
+| TF-06-12 | Modifier une activité avec URL invalide | 422 — données invalides |
+
+### 6.5 Tests de non-régression
+
+Les tests de non-régression vérifient que les règles du cahier des charges et les droits d'accès restent respectés après toute modification du code.
+
+| ID | Scénario | Résultat attendu |
+|---|---|---|
+| TNR-01-01 | Tenter de créer un article via l'API | 405 — action non autorisée |
+| TNR-01-02 | Tenter de supprimer un article via l'API | 405 — action non autorisée |
+| TNR-01-03 | Tenter de supprimer une activité via l'API | 405 — action non autorisée |
+| TNR-02-01 | Accéder à une page admin (utilisateur) | 403 sur toutes les pages admin |
+| TNR-02-02 | Accéder à une page protégée (visiteur) | 401 sur toutes les pages protégées |
+| TNR-02-03 | Modifier le compte d'une autre personne | 403 — accès interdit |
+
+### 6.6 Récapitulatif
+
+| Catégorie | Nombre de cas |
+|---|---|
+| Tests unitaires | 18 cas |
+| Tests fonctionnels | 30 cas |
+| Tests de non-régression | 6 cas |
+| **Total** | **54 cas** |
+
+Tous les tests doivent passer sans erreur. Tout nouveau développement doit être accompagné d'au moins un test couvrant le cas nominal et un cas d'erreur.
 
 ---
 
 ## 7. Procédure de validation et modèle de PV de recette
 
-> *À rédiger*
+### 7.1 Objectif
+
+La procédure de validation permet de vérifier, avant toute mise en production, que l'application CESIZen fonctionne correctement et est conforme aux exigences définies dans le cahier des charges. Elle s'appuie sur les scénarios de tests décrits dans la section 6 et donne lieu à la rédaction d'un Procès-Verbal (PV) de recette signé par les parties concernées.
+
+---
+
+### 7.2 Étapes de la procédure
+
+#### Étape 1 — Préparation
+
+Avant de commencer les tests, s'assurer que :
+
+- L'application est installée et fonctionnelle sur l'environnement de recette (voir section 5)
+- La base de données est alimentée avec les données de test
+- Les trois profils utilisateurs sont disponibles : administrateur, utilisateur connecté, visiteur
+
+#### Étape 2 — Exécution des tests automatisés
+
+Lancer la suite de tests automatisés depuis le dossier racine du projet :
+
+```bash
+pytest tests/ -v
+```
+
+- Tous les tests doivent passer (affichage en vert)
+- En cas d'échec, noter le ou les tests concernés et corriger avant de poursuivre
+
+#### Étape 3 — Rédaction du PV de recette
+
+À l'issue des tests, compléter le modèle de PV de recette (section 7.3) avec les résultats obtenus, puis le faire signer par le responsable du projet.
+
+#### Étape 5 — Décision
+
+| Résultat | Décision |
+|---|---|
+| Tous les tests conformes | Validation prononcée — mise en production autorisée |
+| Anomalies mineures | Validation conditionnelle — corrections à apporter avant livraison |
+| Anomalies bloquantes | Validation refusée — retour en développement |
+
+---
+
+### 7.3 Modèle de PV de recette
+
+---
+
+**PROCÈS-VERBAL DE RECETTE**
+
+**Projet :** CESIZen — Plateforme de bien-être mental  
+**Version testée :** _______________  
+**Date de recette :** _______________  
+**Environnement :** _______________
+
+---
+
+**Participants**
+
+| Rôle | Nom | Signature |
+|---|---|---|
+| Développeur | | |
+| Responsable du projet | | |
+
+---
+
+**Résultats des tests automatisés**
+
+| Résultat | Valeur |
+|---|---|
+| Nombre total de tests | |
+| Tests réussis | |
+| Tests échoués | |
+| Commande exécutée | `pytest tests/ -v` |
+
+---
+
+**Résultats des tests par catégorie**
+
+| Catégorie | Nb de cas | Conformes | Non conformes |
+|---|---|---|---|
+| Tests unitaires | 18 | | |
+| Tests fonctionnels | 30 | | |
+| Tests de non-régression | 6 | | |
+| **Total** | **54** | | |
+
+---
+
+**Anomalies constatées**
+
+| ID du test | Description de l'anomalie | Gravité (mineure / bloquante) | Statut |
+|---|---|---|---|
+| | | | |
+| | | | |
+
+*Gravité mineure : l'application fonctionne mais un comportement ne correspond pas exactement à l'attendu.*  
+*Gravité bloquante : une fonctionnalité essentielle ne fonctionne pas.*
+
+---
+
+**Décision**
+
+☐ Validation prononcée — mise en production autorisée  
+☐ Validation conditionnelle — corrections mineures à apporter  
+☐ Validation refusée — anomalies bloquantes à corriger  
+
+**Commentaires :**
+
+_____________________________________________________________________________
+
+_____________________________________________________________________________
+
+---
+
+**Signatures**
+
+| | Développeur | Responsable du projet |
+|---|---|---|
+| Nom | | |
+| Date | | |
+| Signature | | |
