@@ -13,8 +13,8 @@ load_dotenv()
 # Clé secrète chargée depuis le fichier .env (jamais en dur dans le code)
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
-# Durée de validité du token : 60 minutes
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
+# Durée de validité du token : 30 jours
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 30
 
 # LOGIN
 # Principe du JWT en 5 étapes :

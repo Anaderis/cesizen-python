@@ -185,17 +185,28 @@ function youtubeId(url) {
   return match ? match[1] : null
 }
 
+const ACTIVITY_IMAGES = [
+  'activity-burnout.jpg',
+  'activity-depression.jpg',
+  'img-activities.jpg',
+]
+
+function toSlug(str) {
+  return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+}
+
 function thumbUrl(activity) {
   // Vidéo YouTube → miniature auto
   const ytId = youtubeId(activity.url)
   if (ytId) return `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`
-  // Autre format → photo stockée dans assets
+  // Photo explicite stockée
   if (activity.photo) return `/src/assets/img/${activity.photo}`
-  // Fallback par format
-  const slug = formatSlug(activity.format?.type)
-  if (slug === 'pdf')   return '/src/assets/img/placeholder-pdf.jpg'
-  if (slug === 'audio') return '/src/assets/img/placeholder-audio.jpg'
-  return '/src/assets/img/placeholder-activity.jpg'
+  // Correspondance par nom de catégorie (ex: "Burnout" → activity-burnout.jpg)
+  const catSlug = toSlug(activity.category?.name ?? '')
+  const matched = catSlug && ACTIVITY_IMAGES.find(img => img.includes(catSlug))
+  if (matched) return `/src/assets/img/${matched}`
+  // Fallback déterministe basé sur l'id
+  return `/src/assets/img/${ACTIVITY_IMAGES[activity.id % ACTIVITY_IMAGES.length]}`
 }
 
 function onImgError(e) {

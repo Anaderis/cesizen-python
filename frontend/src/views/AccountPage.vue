@@ -13,6 +13,7 @@
           <p v-if="user?.description" class="account-hero__quote">
             "{{ user.description }}"
           </p>
+          <button @click="logout" class="btn btn-logout-account">Se déconnecter</button>
         </div>
         <div v-if="user?.photo" class="account-hero__avatar">
           <img :src="`/img/${user.photo}`" :alt="user.name" />
@@ -27,6 +28,18 @@
 
       <!-- ===================== NAVIGATION ONGLETS ===================== -->
       <div class="tabs-nav" v-if="user">
+        <!-- Select mobile -->
+        <div class="container tabs-nav__select-wrap">
+          <select class="tabs-select" :value="activeTab" @change="switchTab($event.target.value)">
+            <option value="account">Mon compte</option>
+            <template v-if="user.role_id === 2">
+              <option value="users">Gestion des utilisateurs</option>
+              <option value="articles">Informations Articles</option>
+              <option value="activities">Activités de détente</option>
+            </template>
+          </select>
+        </div>
+        <!-- Boutons desktop -->
         <div class="container tabs-nav__inner">
           <button
             @click="switchTab('account')"
@@ -242,20 +255,20 @@
               </thead>
               <tbody>
                 <tr v-for="u in users" :key="u.id">
-                  <td>{{ u.name }}</td>
-                  <td>{{ u.surname }}</td>
-                  <td>{{ u.email }}</td>
-                  <td>
+                  <td data-label="Prénom">{{ u.name }}</td>
+                  <td data-label="Nom">{{ u.surname }}</td>
+                  <td data-label="Email">{{ u.email }}</td>
+                  <td data-label="Rôle">
                     <span :class="['role-badge', u.role_id === 2 ? 'role-badge--admin' : 'role-badge--user']">
                       {{ u.role_id === 2 ? 'Admin' : 'Utilisateur' }}
                     </span>
                   </td>
-                  <td>
+                  <td data-label="Statut">
                     <span :class="['status-badge', u.is_active ? 'status-badge--active' : 'status-badge--inactive']">
                       {{ u.is_active ? 'Actif' : 'Inactif' }}
                     </span>
                   </td>
-                  <td class="actions-cell">
+                  <td data-label="Actions" class="actions-cell">
                     <button @click="openEditUser(u)" class="btn btn-sm btn-outline">Modifier</button>
                     <button
                       v-if="u.is_active && u.id !== user.id"
@@ -305,15 +318,15 @@
               </thead>
               <tbody>
                 <tr v-for="a in articles" :key="a.id">
-                  <td>{{ a.title }}</td>
-                  <td>{{ a.category?.name ?? '—' }}</td>
-                  <td>{{ a.publish_date ?? '—' }}</td>
-                  <td>
+                  <td data-label="Titre">{{ a.title }}</td>
+                  <td data-label="Catégorie">{{ a.category?.name ?? '—' }}</td>
+                  <td data-label="Date de publication">{{ a.publish_date ?? '—' }}</td>
+                  <td data-label="Statut">
                     <span :class="['status-badge', a.active ? 'status-badge--active' : 'status-badge--inactive']">
                       {{ a.active ? 'Actif' : 'Inactif' }}
                     </span>
                   </td>
-                  <td class="actions-cell">
+                  <td data-label="Actions" class="actions-cell">
                     <button @click="openEditArticle(a)" class="btn btn-sm btn-outline">Modifier</button>
                   </td>
                 </tr>
@@ -352,9 +365,17 @@
                 <textarea v-model="createActivityForm.description" rows="3" placeholder="Courte description…"></textarea>
               </div>
               <div class="form-group">
-                <label>URL (YouTube, audio, PDF…)</label>
-                <input v-model="createActivityForm.url" type="text" placeholder="https://… ou /static/pdf/fichier.pdf" />
-                <span class="form-hint">Adresse web (https://…) ou chemin statique avec extension (/static/pdf/fichier.pdf)</span>
+                <label>Ressource (YouTube, PDF, audio…)</label>
+                <div class="url-upload-row">
+                  <input v-model="createActivityForm.url" type="text" placeholder="https://www.youtube.com/…" class="url-upload-row__input" />
+                  <button type="button" class="btn btn-outline btn-sm url-upload-row__btn"
+                    :disabled="uploadingCreate" @click="triggerUploadCreate">
+                    {{ uploadingCreate ? 'Envoi…' : '⬆ Importer un fichier' }}
+                  </button>
+                  <input ref="fileInputCreate" type="file" accept=".pdf,.mp3,.wav,.ogg,.m4a"
+                    style="display:none" @change="handleFileCreate" />
+                </div>
+                <span class="form-hint">Lien YouTube <strong>ou</strong> importez un PDF / fichier audio depuis votre ordinateur</span>
               </div>
               <div class="form-group">
                 <label>Durée</label>
@@ -400,16 +421,16 @@
               </thead>
               <tbody>
                 <tr v-for="a in activities" :key="a.id">
-                  <td>{{ a.title }}</td>
-                  <td>{{ a.category?.name ?? '—' }}</td>
-                  <td>{{ a.format?.type ?? '—' }}</td>
-                  <td>{{ a.duration ?? '—' }}</td>
-                  <td>
+                  <td data-label="Titre">{{ a.title }}</td>
+                  <td data-label="Catégorie">{{ a.category?.name ?? '—' }}</td>
+                  <td data-label="Format">{{ a.format?.type ?? '—' }}</td>
+                  <td data-label="Durée">{{ a.duration ?? '—' }}</td>
+                  <td data-label="Statut">
                     <span :class="['status-badge', a.active ? 'status-badge--active' : 'status-badge--inactive']">
                       {{ a.active ? 'Active' : 'Inactive' }}
                     </span>
                   </td>
-                  <td class="actions-cell">
+                  <td data-label="Actions" class="actions-cell">
                     <button @click="openEditActivity(a)" class="btn btn-sm btn-outline">Modifier</button>
                     <button
                       v-if="a.active"
@@ -555,9 +576,17 @@
               <textarea v-model="editModal.form.description" rows="3"></textarea>
             </div>
             <div class="form-group">
-              <label>URL (YouTube, audio, PDF…)</label>
-              <input v-model="editModal.form.url" type="text" placeholder="https://… ou /static/pdf/fichier.pdf" />
-              <span class="form-hint">Adresse web (https://…) ou chemin statique avec extension (/static/pdf/fichier.pdf)</span>
+              <label>Ressource (YouTube, PDF, audio…)</label>
+              <div class="url-upload-row">
+                <input v-model="editModal.form.url" type="text" placeholder="https://www.youtube.com/…" class="url-upload-row__input" />
+                <button type="button" class="btn btn-outline btn-sm url-upload-row__btn"
+                  :disabled="uploadingEdit" @click="triggerUploadEdit">
+                  {{ uploadingEdit ? 'Envoi…' : '⬆ Importer un fichier' }}
+                </button>
+                <input ref="fileInputEdit" type="file" accept=".pdf,.mp3,.wav,.ogg,.m4a"
+                  style="display:none" @change="handleFileEdit" />
+              </div>
+              <span class="form-hint">Lien YouTube <strong>ou</strong> importez un PDF / fichier audio depuis votre ordinateur</span>
             </div>
             <div class="form-row">
               <div class="form-group">
@@ -607,6 +636,11 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
+function logout() {
+  localStorage.removeItem('token')
+  router.push('/login')
+}
+
 // ── Données utilisateur ──────────────────────────────────────
 const user    = ref(null)
 const loading = ref(true)
@@ -637,6 +671,51 @@ const modal = reactive({ visible: false, action: '', title: '', message: '', tar
 // ── Auth helpers ─────────────────────────────────────────────
 function authHeaders() {
   return { 'Authorization': `Bearer ${localStorage.getItem('token')}`, 'Content-Type': 'application/json' }
+}
+
+// ── Upload fichier activité ───────────────────────────────────
+const uploadingCreate  = ref(false)
+const uploadingEdit    = ref(false)
+const fileInputCreate  = ref(null)
+const fileInputEdit    = ref(null)
+
+function triggerUploadCreate() { fileInputCreate.value?.click() }
+function triggerUploadEdit()   { fileInputEdit.value?.click()   }
+
+async function handleFileCreate(e) {
+  const file = e.target.files[0]
+  e.target.value = ''
+  if (!file) return
+  await uploadFile(file, createActivityForm, uploadingCreate)
+}
+
+async function handleFileEdit(e) {
+  const file = e.target.files[0]
+  e.target.value = ''
+  if (!file) return
+  await uploadFile(file, editModal.form, uploadingEdit)
+}
+
+async function uploadFile(file, targetForm, uploadingFlag) {
+  uploadingFlag.value = true
+  try {
+    const formData = new FormData()
+    formData.append('file', file)
+    const res = await fetch('/api/activities/upload', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+      body: formData,
+    })
+    if (!res.ok) {
+      const err = await res.json()
+      alert(err.detail ?? 'Erreur lors de l\'upload.')
+      return
+    }
+    const data = await res.json()
+    targetForm.url = data.url
+  } finally {
+    uploadingFlag.value = false
+  }
 }
 
 function getUserIdFromToken() {
@@ -1137,6 +1216,22 @@ watch(activeTab, (tab) => {
   padding: 0.15rem 0.6rem;
   border-radius: 999px;
 }
+.btn-logout-account {
+  margin-top: 1rem;
+  background-color: transparent;
+  border: 2px solid rgba(255,255,255,0.7);
+  color: #ffffff;
+  padding: 0.4rem 1rem;
+  border-radius: var(--border-radius);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+.btn-logout-account:hover {
+  background-color: rgba(255,255,255,0.15);
+  border-color: #ffffff;
+}
 .account-hero__avatar {
   width: 100px;
   height: 100px;
@@ -1319,7 +1414,12 @@ watch(activeTab, (tab) => {
 }
 .fav-card__title { font-size: 0.9rem; font-weight: 700; color: var(--color-text); }
 .fav-card__duration { font-size: 0.78rem; color: var(--color-text-muted); }
-.fav-card__actions { display: flex; gap: 0.5rem; flex-shrink: 0; }
+.fav-card__actions { display: flex; gap: 0.5rem; flex-shrink: 0; flex-wrap: wrap; }
+
+@media (max-width: 480px) {
+  .fav-card { flex-wrap: wrap; }
+  .fav-card__actions { width: 100%; justify-content: flex-end; }
+}
 
 /* ── Boutons utilitaires ─────────────────────────────────── */
 .btn-sm { padding: 0.35rem 0.85rem; font-size: 0.8rem; }
@@ -1453,5 +1553,81 @@ watch(activeTab, (tab) => {
   .rgpd-actions { flex-direction: column; }
   .tab-btn { padding: 0.75rem 1rem; font-size: 0.82rem; }
   .admin-section-header { flex-direction: column; align-items: flex-start; }
+}
+
+/* ── Champ URL + bouton upload ───────────────────────────── */
+.url-upload-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.url-upload-row__input { flex: 1; min-width: 0; }
+.url-upload-row__btn   { cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+.btn--loading          { opacity: 0.6; pointer-events: none; }
+
+/* ── Onglets : select mobile / boutons desktop ───────────── */
+.tabs-nav__select-wrap { display: none; }
+
+@media (max-width: 768px) {
+  .tabs-nav__inner     { display: none; }
+  .tabs-nav__select-wrap {
+    display: block;
+    padding: 0.75rem 1rem;
+  }
+  .tabs-select {
+    width: 100%;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background: var(--color-surface);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-text);
+    cursor: pointer;
+  }
+}
+
+/* ── Tableaux admin : cartes empilées sur mobile ─────────── */
+@media (max-width: 640px) {
+  .admin-table-wrap { overflow-x: visible; }
+
+  .admin-table thead { display: none; }
+
+  .admin-table,
+  .admin-table tbody,
+  .admin-table tr,
+  .admin-table td { display: block; width: 100%; }
+
+  .admin-table tr {
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    margin-bottom: 0.75rem;
+    padding: 0.25rem 0;
+  }
+
+  .admin-table td {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.75rem;
+    border-bottom: 1px solid var(--color-border);
+    font-size: 0.875rem;
+  }
+
+  .admin-table tr td:last-child { border-bottom: none; }
+
+  .admin-table td::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    width: 110px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-text-muted);
+  }
+
+  .actions-cell { flex-wrap: wrap; }
 }
 </style>

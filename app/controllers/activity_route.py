@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, UploadFile, File
 from app.schemas.content_schema import ActivityCreate, ActivityUpdate, ActivityOut
 from app.services.content_service import (
     get_all_activities, get_all_activities_admin, get_activity_by_id, get_activities_by_category,
@@ -7,6 +7,12 @@ from app.services.content_service import (
 )
 from app.dependencies import require_admin, require_user
 from app.services.log_service import write_log
+import shutil, uuid, os
+from pathlib import Path
+
+# Dossier racine du projet (remonte de app/controllers/ → racine)
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+STATIC_DIR   = PROJECT_ROOT / "app" / "static"
 
 route = APIRouter(prefix="/activities", tags=["Activities"])
 
@@ -42,6 +48,37 @@ def get_activity_endpoint(id: int):
     if not activity:
         raise HTTPException(status_code=404, detail="Activité non trouvée")
     return activity
+
+
+# POST : Uploader un fichier (PDF ou audio) → admin uniquement
+ALLOWED_EXTENSIONS = {
+    "pdf":  ("pdfs",   "application/pdf"),
+    "mp3":  ("audios", "audio/mpeg"),
+    "wav":  ("audios", "audio/wav"),
+    "ogg":  ("audios", "audio/ogg"),
+    "m4a":  ("audios", "audio/mp4"),
+}
+
+@route.post("/upload")
+async def upload_activity_file(file: UploadFile = File(...), current_user: dict = Depends(require_admin)):
+    ext = file.filename.rsplit(".", 1)[-1].lower() if "." in file.filename else ""
+    if ext not in ALLOWED_EXTENSIONS:
+        raise HTTPException(status_code=400, detail="Format non autorisé. Formats acceptés : PDF, MP3, WAV, OGG, M4A.")
+
+    subfolder, _ = ALLOWED_EXTENSIONS[ext]
+    dest_dir = STATIC_DIR / "activities" / subfolder
+    dest_dir.mkdir(parents=True, exist_ok=True)
+
+    # Nom unique pour éviter les collisions
+    unique_name = f"{uuid.uuid4().hex}.{ext}"
+    dest_path = dest_dir / unique_name
+
+    with open(dest_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+    url_path = f"/static/activities/{subfolder}/{unique_name}"
+    write_log(current_user["id"], "Upload fichier activité", url_path)
+    return {"url": url_path}
 
 
 # POST : Créer une activité → admin uniquement
