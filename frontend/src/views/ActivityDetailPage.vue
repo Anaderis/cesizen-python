@@ -143,9 +143,10 @@ onMounted(async () => {
 
 const formatSlug = computed(() => {
   const type = activity.value?.format?.type?.toLowerCase() ?? ''
-  if (type.includes('vid'))   return 'video'
-  if (type.includes('pdf'))   return 'pdf'
-  if (type.includes('audio')) return 'audio'
+  const url  = activity.value?.url?.toLowerCase() ?? ''
+  if (type.includes('vid') || url.match(/youtube\.com|youtu\.be/)) return 'video'
+  if (type.includes('pdf') || url.endsWith('.pdf'))                  return 'pdf'
+  if (type.includes('audio') || url.match(/\.(mp3|wav|ogg|m4a)$/))  return 'audio'
   return 'other'
 })
 

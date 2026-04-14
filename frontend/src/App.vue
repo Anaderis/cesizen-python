@@ -58,11 +58,7 @@ function logout() {
 
       <!-- Bouton connexion + hamburger -->
       <div class="navbar__right">
-        <template v-if="isLoggedIn">
-          <router-link to="/account" class="btn btn-primary navbar__cta">Mon compte</router-link>
-          <button @click="logout" class="btn btn-logout navbar__cta">Se déconnecter</button>
-        </template>
-        <router-link v-else to="/login" class="btn btn-primary navbar__cta">Mon compte</router-link>
+        <router-link to="/account" class="btn btn-primary navbar__cta">Mon compte</router-link>
 
         <button
           class="hamburger"
@@ -84,7 +80,8 @@ function logout() {
         <li><router-link to="/">Accueil</router-link></li>
         <li><router-link to="/activities">Activités de détente</router-link></li>
         <li><router-link to="/prevention">Santé mentale</router-link></li>
-        <li><router-link to="/login">Connexion</router-link></li>
+        <li v-if="isLoggedIn"><button @click="logout" class="mobile-menu__logout">Se déconnecter</button></li>
+        <li v-else><router-link to="/login">Connexion</router-link></li>
       </ul>
     </div>
   </header>
@@ -236,17 +233,6 @@ function logout() {
   color: #ffffff !important;
   text-decoration: none;
 }
-.btn-logout {
-  background-color: transparent;
-  border: 2px solid var(--color-primary);
-  color: var(--color-primary) !important;
-  cursor: pointer;
-}
-.btn-logout:hover {
-  background-color: var(--color-primary);
-  color: #ffffff !important;
-}
-
 /* Hamburger (caché sur desktop) */
 .hamburger {
   display: none;
@@ -293,6 +279,24 @@ function logout() {
 
 .mobile-menu a:hover,
 .mobile-menu a.router-link-active {
+  background-color: var(--color-surface-teal);
+  color: var(--color-primary);
+}
+
+.mobile-menu__logout {
+  display: block;
+  width: 100%;
+  padding: 0.85rem 1.5rem;
+  text-align: left;
+  background: none;
+  border: none;
+  color: var(--color-text);
+  font-weight: 500;
+  font-size: inherit;
+  cursor: pointer;
+  transition: background-color var(--transition), color var(--transition);
+}
+.mobile-menu__logout:hover {
   background-color: var(--color-surface-teal);
   color: var(--color-primary);
 }
