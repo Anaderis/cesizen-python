@@ -21,5 +21,5 @@ pip install -r requirements.txt
 # Lancer l'API
 uvicorn app.main:app --reload
 
-# Installation de uvicorn avec python puisque windows fait ce qu'il veut
+# Installation de uvicorn avec python 
 python -m uvicorn app.main:app --reload
