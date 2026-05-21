@@ -23,5 +23,3 @@ uvicorn app.main:app --reload
 
 # Installation de uvicorn avec python 
 python -m uvicorn app.main:app --reload
-
-# ---- DOCKER ----- 
