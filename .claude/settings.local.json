@@ -11,7 +11,20 @@
       "WebFetch(domain:aaru5h.github.io)",
       "WebFetch(domain:sanchariiii.github.io)",
       "WebFetch(domain:amalkrishnanvp.github.io)",
-      "Bash(python3 -c ':*)"
+      "Bash(python3 -c ':*)",
+      "Bash(python -c \"import pdfplumber; print\\('pdfplumber ok'\\)\")",
+      "Bash(python -c \"import pypdf; print\\('pypdf ok'\\)\")",
+      "Bash(python -c \"import PyPDF2; print\\('PyPDF2 ok'\\)\")",
+      "Bash(pdftotext \"/c/Users/Anaïs/Documents/cesizen-python/documentation/Rendu final CESIZEN.pdf\" -)",
+      "Bash(python -c \"import matplotlib; print\\(matplotlib.__version__\\)\")",
+      "Bash(pip install *)",
+      "Bash(python -c \"from PIL import Image, ImageDraw, ImageFont; print\\('PIL ok'\\)\")",
+      "Bash(python -c \"import matplotlib; print\\('matplotlib ok'\\)\")",
+      "Bash(git checkout *)",
+      "Bash(git push *)"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\Anaïs\\Desktop"
     ]
   }
 }
