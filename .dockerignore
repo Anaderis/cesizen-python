@@ -7,7 +7,6 @@ __pycache__/
 .gitignore
 test.db
 tests/
-frontend/
 *.md
 presentation/
 documentation/
