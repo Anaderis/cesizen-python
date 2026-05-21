@@ -1,0 +1,12 @@
+pythonCesizen/
+__pycache__/
+*.pyc
+*.pyo
+.env
+.git
+.gitignore
+test.db
+tests/
+*.md
+presentation/
+documentation/
