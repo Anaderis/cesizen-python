@@ -1,0 +1,66 @@
+name: CI — Stage
+
+on:
+  pull_request:
+    branches:
+      - stage
+
+jobs:
+  tests:
+    name: Tests pytest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Installer les dépendances
+        run: pip install -r requirements.txt
+
+      - name: Créer le fichier .env
+        run: |
+          echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" > .env
+          echo "DATABASE_URL=sqlite:///./test.db" >> .env
+          echo "POSTGRES_DB=cesizen_stage" >> .env
+          echo "POSTGRES_USER=postgres" >> .env
+          echo "POSTGRES_PASSWORD=postgres" >> .env
+
+      - name: Lancer les tests
+        run: python -m pytest tests/ -v
+
+  docker-check:
+    name: Build Docker et démarrage containers
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Créer le fichier .env.stage
+        run: |
+          echo "SECRET_KEY=ci-secret-key" > .env.stage
+          echo "DATABASE_URL=postgresql://postgres:postgres@db:5432/cesizen_stage" >> .env.stage
+          echo "POSTGRES_DB=cesizen_stage" >> .env.stage
+          echo "POSTGRES_USER=postgres" >> .env.stage
+          echo "POSTGRES_PASSWORD=postgres" >> .env.stage
+
+      - name: Build et démarrage des containers
+        run: docker compose -f docker/docker-compose.stage.yml --env-file .env.stage up -d --build
+
+      - name: Attendre que le backend soit prêt
+        run: |
+          for i in $(seq 1 15); do
+            if docker compose -f docker/docker-compose.stage.yml exec -T backend curl -sf http://localhost:8000/docs > /dev/null 2>&1; then
+              echo "Backend prêt"
+              exit 0
+            fi
+            echo "Attente... ($i/15)"
+            sleep 3
+          done
+          echo "Backend non disponible après 45s"
+          docker compose -f docker/docker-compose.stage.yml logs backend
+          exit 1
+
+      - name: Afficher l'état des containers
+        if: always()
+        run: docker compose -f docker/docker-compose.stage.yml ps
