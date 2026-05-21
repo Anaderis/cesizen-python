@@ -14,3 +14,8 @@ __pycache__/
 
 # Variables d'environnement (contient les clés secrètes)
 .env
+.env.stage
+.env.prod
+
+# Base de données de test (générée par pytest)
+test.db
