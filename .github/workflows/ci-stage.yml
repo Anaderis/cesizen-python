@@ -50,7 +50,7 @@ jobs:
       - name: Attendre que le backend soit prêt
         run: |
           for i in $(seq 1 15); do
-            if docker compose -f docker/docker-compose.stage.yml exec -T backend curl -sf http://localhost:8000/docs > /dev/null 2>&1; then
+            if curl -sf http://localhost:8000/docs > /dev/null 2>&1; then
               echo "Backend prêt"
               exit 0
             fi
@@ -58,9 +58,9 @@ jobs:
             sleep 3
           done
           echo "Backend non disponible après 45s"
-          docker compose -f docker/docker-compose.stage.yml logs backend
+          docker compose -f docker/docker-compose.stage.yml --env-file .env.stage logs backend
           exit 1
 
       - name: Afficher l'état des containers
         if: always()
-        run: docker compose -f docker/docker-compose.stage.yml ps
+        run: docker compose -f docker/docker-compose.stage.yml --env-file .env.stage ps
