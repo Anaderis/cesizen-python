@@ -48,6 +48,7 @@ jobs:
           context: .
           file: docker/Dockerfile
           push: true
+          provenance: false
           tags: |
             ghcr.io/${{ env.REPO }}:latest
             ghcr.io/${{ env.REPO }}:${{ github.sha }}
