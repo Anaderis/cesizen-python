@@ -108,12 +108,12 @@ Les credentials de la base de données ne sont jamais écrits en dur dans les fi
 | Environnement | Fichier | Commande de démarrage |
 |---|---|---|
 | Dev | `.env` | `docker compose -f docker/docker-compose.dev.yml up -d` |
-| Staging | `.env.stage` | `docker compose -f docker/docker-compose.stage.yml --env-file .env.stage up -d` |
-| Production | `.env.prod` | `docker compose -f docker/docker-compose.prod.yml --env-file .env.prod up -d` |
+| Staging | `.env.stage` | `docker compose -f docker/docker-compose.stage.yml up -d` |
+| Production | `.env.prod` | `docker compose -f docker/docker-compose.prod.yml up -d` |
 
 #### Environnement de développement
 
-Utilisé au quotidien sur les branches issues. Le code source est monté en **volume** dans le container backend — toute modification de fichier Python est visible instantanément sans rebuild. Uvicorn tourne avec `--reload`. Le frontend utilise le serveur Vite avec hot reload.
+Utilisé au quotidien sur les branches des différentes issues. A chaque nouvelle feature, une issue est créée avec sa branche associée. Le code source est monté en **volume** dans le container backend — toute modification de fichier Python est visible instantanément sans rebuild. Uvicorn tourne avec `--reload`. Le frontend utilise le serveur Vite avec hot reload.
 
 | Service | Image | Port exposé | Particularités |
 |---|---|---|---|
@@ -140,6 +140,22 @@ Utilisé sur la branche `main`. Le backend est lancé avec **Gunicorn** et deux 
 | `db` | postgres:16-alpine | — | Volume `pgdata_prod`, credentials sécurisés |
 | `backend` | Dockerfile buildé | — | Gunicorn 2 workers, restart automatique |
 | `frontend` | Dockerfile.frontend | 80 | Nginx reverse proxy, restart automatique |
+
+#### Isolation des bases de données
+
+Chaque environnement dispose de sa propre base de données, isolée des autres à deux niveaux.
+
+**Au niveau des volumes Docker** — les données PostgreSQL sont stockées dans un volume dédié par environnement. Ces volumes sont complètement indépendants : lancer l'environnement de dev ne touche jamais aux données de staging ou de production.
+
+| Environnement | Volume | Base de données |
+|---|---|---|
+| Dev | `pgdata_dev` | `cesizen_dev` |
+| Staging | `pgdata_stage` | `cesizen_stage` |
+| Production | `pgdata_prod` | `cesizen` |
+
+**Au niveau du nom de la base** — chaque fichier `.env` définit un `POSTGRES_DB` différent. PostgreSQL crée la base correspondante au premier démarrage et y écrit toutes les données.
+
+Quand un container `db` s'arrête, le volume persiste. Au redémarrage suivant, PostgreSQL retrouve ses données exactement là où il les avait laissées. Casser la base de développement n'affecte ni le staging ni la production.
 
 ---
 
