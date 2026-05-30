@@ -1,0 +1,45 @@
+name: Évolution
+description: Proposer une évolution ou une nouvelle fonctionnalité
+labels: ["évolution"]
+body:
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priorité estimée
+      options:
+        - "Haute"
+        - "Moyenne"
+        - "Basse"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description de la demande
+      placeholder: Décrivez l'évolution souhaitée...
+    validations:
+      required: true
+
+  - type: textarea
+    id: justification
+    attributes:
+      label: Justification / besoin métier
+      placeholder: Pourquoi cette évolution est-elle nécessaire ? Quel problème résout-elle ?
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Critères d'acceptation
+      placeholder: |
+        L'évolution sera considérée comme terminée quand :
+        - ...
+        - ...
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Informations complémentaires
+      placeholder: Maquettes, références, contraintes techniques...

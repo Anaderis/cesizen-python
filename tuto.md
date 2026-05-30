@@ -23,3 +23,8 @@ uvicorn app.main:app --reload
 
 # Installation de uvicorn avec python 
 python -m uvicorn app.main:app --reload
+
+# DOCKER
+
+# Lancement docker 
+docker compose -f docker/docker-compose.dev.yml up -d
