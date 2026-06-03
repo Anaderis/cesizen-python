@@ -23,12 +23,14 @@ Flux de merge :
 Format obligatoire (Conventional Commits) :
 
 ```
-<type>(<portée>) : <description courte>
+<type>(<portée>): <description courte>
 ```
 
 - `type` : nature de la modification (voir liste ci-dessous)
 - `portée` : module ou fichier concerné (optionnel)
 - `description` : phrase courte, au présent, sans majuscule, sans point final
+
+> Le format sans espace avant `:` est requis pour que semantic-release génère automatiquement les versions et le CHANGELOG.
 
 ### Types autorisés
 
@@ -45,18 +47,19 @@ Format obligatoire (Conventional Commits) :
 ### Exemples corrects
 
 ```
-feat(auth) : ajouter la connexion par token JWT
-fix(docker) : corriger la variable DATABASE_URL dans le compose dev
-docs : mettre à jour le CHANGELOG pour la v1.1.0
-chore(ci) : ajouter le workflow de publication Docker
-test(users) : ajouter les tests de création de compte
+feat(auth): ajouter la connexion par token JWT
+fix(docker): corriger la variable DATABASE_URL dans le compose dev
+docs: mettre à jour le CHANGELOG pour la v1.1.0
+chore(ci): ajouter le workflow de publication Docker
+test(users): ajouter les tests de création de compte
 ```
 
 ### Exemples incorrects
 
 ```
-Fix : correction bug         ← majuscule sur le type
-fix: Correction bug          ← majuscule sur la description, pas d'espace avant le ":"
+Fix: correction bug          ← majuscule sur le type
+fix: Correction bug          ← majuscule sur la description
+fix : correction bug         ← espace avant le ":" — non reconnu par semantic-release
 mise à jour docker           ← pas de type
 update stuff                 ← trop vague
 ```
