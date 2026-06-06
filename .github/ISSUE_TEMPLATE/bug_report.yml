@@ -8,10 +8,9 @@ body:
       label: Sévérité
       description: Choisir le niveau de sévérité selon l'impact sur le service
       options:
-        - "Bloquant critique — service inutilisable, aucune solution de contournement"
-        - "Bloquant fort — service inutilisable, contournement possible"
-        - "Majeur — service intermittent ou dégradé"
-        - "Mineur — altération de qualité, service toujours opérationnel"
+        - "bug:bloquant — service inutilisable"
+        - "bug:majeur — service intermittent ou dégradé"
+        - "bug:mineur — altération de qualité, service toujours opérationnel"
     validations:
       required: true
 
