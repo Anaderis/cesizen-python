@@ -64,19 +64,19 @@
       <div class="features__grid">
 
         <article class="card feature-card">
-          <img src="../assets/img/img-articles.jpg" alt="Personne se reposant dans la nature" class="feature-card__img" />
+          <img src="/img/img-articles.jpg" alt="Personne se reposant dans la nature" class="feature-card__img" />
           <h3>Articles santé mentale</h3>
           <p>Accédez à des ressources fiables sur le stress, l'anxiété, le burn-out et bien d'autres thématiques.</p>
         </article>
 
         <article class="card feature-card">
-          <img src="../assets/img/img-activities.jpg" alt="Femme pratiquant la méditation en plein air" class="feature-card__img" />
+          <img src="/img/img-activities.jpg" alt="Femme pratiquant la méditation en plein air" class="feature-card__img" />
           <h3>Activités de détente</h3>
           <p>Découvrez des exercices de méditation, respiration et relaxation adaptés à votre rythme.</p>
         </article>
 
         <article class="card feature-card">
-          <img src="../assets/img/img-personal.jpg" alt="Personne contemplant un paysage de montagne" class="feature-card__img" />
+          <img src="/img/img-personal.jpg" alt="Personne contemplant un paysage de montagne" class="feature-card__img" />
           <h3>Espace personnalisé</h3>
           <p>Sauvegardez vos activités favorites et retrouvez-les facilement depuis votre compte.</p>
         </article>
@@ -122,7 +122,7 @@ const carouselArticles = computed(() => articles.value)
 const slideStyle = computed(() => {
   const article = carouselArticles.value[currentIndex.value]
   if (article?.photo) {
-    return { backgroundImage: `url(/src/assets/img/${article.photo})` }
+    return { backgroundImage: `url(/img/${article.photo})` }
   }
   return {}
 })

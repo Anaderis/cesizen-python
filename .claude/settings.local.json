@@ -21,7 +21,9 @@
       "Bash(python -c \"from PIL import Image, ImageDraw, ImageFont; print\\('PIL ok'\\)\")",
       "Bash(python -c \"import matplotlib; print\\('matplotlib ok'\\)\")",
       "Bash(git checkout *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(gh auth *)",
+      "Bash(python documentation/generate_docx.py)"
     ],
     "additionalDirectories": [
       "C:\\Users\\Anaïs\\Desktop"
