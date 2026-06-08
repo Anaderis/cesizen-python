@@ -822,7 +822,7 @@ const filteredFavorites = computed(() =>
 function thumbUrl(activity) {
   const match = activity.url?.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/)
   if (match) return `https://img.youtube.com/vi/${match[1]}/hqdefault.jpg`
-  if (activity.photo) return `/src/assets/img/${activity.photo}`
+  if (activity.photo) return `/img/${activity.photo}`
   return null
 }
 

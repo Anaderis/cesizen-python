@@ -76,7 +76,7 @@
         >
           <img
             v-if="article.photo"
-            :src="`/src/assets/img/${article.photo}`"
+            :src="`/img/${article.photo}`"
             :alt="article.title"
             class="article-card__img"
           />
