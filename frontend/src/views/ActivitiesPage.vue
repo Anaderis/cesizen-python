@@ -200,13 +200,13 @@ function thumbUrl(activity) {
   const ytId = youtubeId(activity.url)
   if (ytId) return `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`
   // Photo explicite stockée
-  if (activity.photo) return `/src/assets/img/${activity.photo}`
+  if (activity.photo) return `/img/${activity.photo}`
   // Correspondance par nom de catégorie (ex: "Burnout" → activity-burnout.jpg)
   const catSlug = toSlug(activity.category?.name ?? '')
   const matched = catSlug && ACTIVITY_IMAGES.find(img => img.includes(catSlug))
-  if (matched) return `/src/assets/img/${matched}`
+  if (matched) return `/img/${matched}`
   // Fallback déterministe basé sur l'id
-  return `/src/assets/img/${ACTIVITY_IMAGES[activity.id % ACTIVITY_IMAGES.length]}`
+  return `/img/${ACTIVITY_IMAGES[activity.id % ACTIVITY_IMAGES.length]}`
 }
 
 function onImgError(e) {
