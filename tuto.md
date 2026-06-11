@@ -33,6 +33,12 @@ python -m uvicorn app.main:app --reload
 
 ---
 
+## BDD
+
+Remettre la BDD
+docker exec -i docker-db-1 psql -U postgres -d cesizen_dev -f /dev/stdin < app/static/sql/cesizen-0104.sql
+
+
 ## Docker — Ports par environnement
     
 | Environnement | Frontend | Backend / API | Base de données |
@@ -209,4 +215,4 @@ git checkout -b 99-nom-de-la-feature
 git push -u origin 99-nom-de-la-feature
 ```
 
-Ordre des merges : branche issue → dev → stage → main
+petit test pour tester
